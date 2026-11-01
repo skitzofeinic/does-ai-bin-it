@@ -164,7 +164,7 @@ function bins({ interactive = false, marks = {}, small = false } = {}) {
     return `<${tag} class="bin${m.truth ? ' truth' : ''}${m.dim ? ' dim' : ''}" data-k="${k}"${attrs}>
       <span class="chips">${(m.chips || []).join('')}</span>
       <span class="bin-lid"></span>
-      <span class="bin-body"${small ? ' style="height:54px"' : ''}>${esc(cap(c))}</span>
+      <span class="bin-body"${small ? ' style="height:54px"' : ''}><span class="bin-label">${esc(cap(c))}</span></span>
     </${tag}>`;
   }).join('')}</div>`;
 }
@@ -575,7 +575,7 @@ function renderBinFill() {
     }
     col.innerHTML = `<p class="fill-num">${fmtNum(counts[k])}</p>`;
     col.append(canvas);
-    col.insertAdjacentHTML('beforeend', `<div class="bin" data-k="${k}"><span class="bin-lid"></span><span class="bin-body">${esc(cap(c))}</span></div>`);
+    col.insertAdjacentHTML('beforeend', `<div class="bin" data-k="${k}"><span class="bin-lid"></span><span class="bin-body"><span class="bin-label">${esc(cap(c))}</span></span></div>`);
     holder.append(col);
   });
 
