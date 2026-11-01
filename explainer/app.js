@@ -970,25 +970,9 @@ async function runParityCheck() {
   document.body.dataset.parity = JSON.stringify({ exactPer, same, total, maxDiff });
 }
 
-// ---------- IDE: regelnummers en actieve tab ----------
-
-const LINE_HEIGHT = 24; // gelijk aan .gutter line-height in styles.css
-
-function renderGutter() {
-  const g = $('#gutter');
-  g.style.height = '0px'; // eerst weg, anders meet hij zijn eigen hoogte mee
-  const h = document.documentElement.scrollHeight;
-  g.style.height = `${h}px`;
-  g.textContent = Array.from({ length: Math.ceil(h / LINE_HEIGHT) }, (_, i) => i + 1).join('\n');
-}
+// ---------- IDE: actieve tab volgt het scrollen ----------
 
 function setupIde() {
-  let timer;
-  new ResizeObserver(() => {
-    clearTimeout(timer);
-    timer = setTimeout(renderGutter, 120);
-  }).observe(document.body);
-
   const tabs = new Map([...document.querySelectorAll('[data-tab]')].map((a) => [a.dataset.tab, a]));
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
@@ -996,7 +980,6 @@ function setupIde() {
       for (const a of tabs.values()) a.removeAttribute('aria-current');
       const tab = tabs.get(entry.target.id);
       tab.setAttribute('aria-current', 'page');
-      $('#sb-file').textContent = tab.textContent;
     }
   }, { rootMargin: '-45% 0px -54% 0px' });
   for (const id of tabs.keys()) observer.observe(document.getElementById(id));
@@ -1005,7 +988,7 @@ function setupIde() {
 // ---------- start ----------
 
 async function loadModels() {
-  setStatus('loading', 'Modellen laden…');
+  setStatus('loading', 'modellen laden…');
   try {
     if (!window.ort) throw new Error('ONNX Runtime Web niet geladen');
     ort.env.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
@@ -1014,12 +997,12 @@ async function loadModels() {
     state.sessions = Object.fromEntries(MODELS.map((m, i) => [m.id, sessions[i]]));
   } catch (err) {
     console.error(err);
-    setStatus('fallback', 'Offline: vooraf berekend');
+    setStatus('fallback', 'offline: vooraf berekend');
     $('#parity').textContent = 'Niet gecontroleerd: de modellen zijn niet geladen.';
     setLive(false);
     return;
   }
-  setStatus('ready', 'modellen geladen · draaien in je browser');
+  setStatus('ready', 'modellen geladen');
   setLive(true);
   if (state.source?.example) await selectExample(state.source.example);
   runParityCheck();
@@ -1050,7 +1033,7 @@ async function init() {
     Object.assign(state, { data, variations, onnx, history: { cnn: hc, mobilenet: hm }, evaluation: { cnn: ec, mobilenet: em } });
   } catch (err) {
     console.error(err);
-    setStatus('error', 'Open via een webserver');
+    setStatus('error', 'open via een webserver');
     return;
   }
 

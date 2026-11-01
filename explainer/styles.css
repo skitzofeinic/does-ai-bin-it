@@ -1,13 +1,14 @@
-/* Welke bak? Ontwerp: een IDE op gebroken wit papier. Tabbalk, regelnummers, statusbalk.
-   Teksteditor-letter (JetBrains Mono), Martian Mono alleen voor titels,
-   geen afrondingen, 1px-lijnen. Eén accentkleur (violet-indigo, anders dan de blauwe papierbak).
-   Andere kleur alleen als die een functie heeft: bakkleuren (welke bak), groen (goed, actief,
-   geladen) en rood (fout). Bakkleuren gevalideerd (dataviz-validator, alle paren, op --bg);
-   elke bak draagt altijd zijn naam, dus de waarschuwingen (geel contrast, rood/groen 7,2) zijn gedekt.
+/* Welke bak? Ontwerp: een IDE in Solarized Light. Sticky tabbalk met bestandsnamen en modelstatus.
+   Alles in JetBrains Mono; titels als Markdown-koppen (# ...), sectielabels als commentaar (// ...).
+   Geen afrondingen, 1px-lijnen. Eén accentkleur (Solarized violet). Andere kleur alleen als die een
+   functie heeft: bakkleuren (welke bak), groen (goed, actief, geladen) en rood (fout).
+   Bakkleuren gevalideerd (dataviz-validator, alle paren, op --bg); elke bak draagt altijd zijn naam,
+   dus de waarschuwingen (geel contrast, rood/groen 7,2) zijn gedekt. Solarized' eigen olijfgroen en
+   mosterdgeel vielen af: voor kleurenblinden vrijwel gelijk (ΔE 1,5).
    Modellen zonder kleur: eigen CNN = doorgetrokken en dicht, MobileNet = gestippeld en open. */
 :root {
   color-scheme: light;
-  --accent: #5a3ee0;
+  --accent: #6c71c4;   /* Solarized violet */
 
   --bin-0: #2a78d6;  /* papier en karton */
   --bin-1: #008300;  /* glas */
@@ -15,31 +16,30 @@
   --bin-3: #e34948;  /* metaal */
   --bin-4: #4a4a4a;  /* restafval */
 
-  --good: #1f8a2b;
-  --bad: #c8352b;
+  --good: #2e7d32;
+  --bad: #dc322f;     /* Solarized red */
 
-  --font-head: 'Martian Mono', 'JetBrains Mono', monospace;
+  --font-head: var(--font);
   --font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --step-small: clamp(0.74rem, 0.72rem + 0.1vw, 0.82rem);
   --step-body: clamp(0.9rem, 0.86rem + 0.15vw, 0.98rem);
   --step-lead: clamp(1rem, 0.92rem + 0.45vw, 1.25rem);
-  --step-head: clamp(2rem, 1.1rem + 3.2vw, 4.2rem);
-  --step-giant: clamp(3rem, 1rem + 7vw, 8rem);
-  /* zijmarge; links extra ruimte voor de regelnummers */
+  --step-head: clamp(1.9rem, 1.2rem + 2.6vw, 3.6rem);
+  --step-giant: clamp(2.8rem, 1.2rem + 5.4vw, 6.4rem);
   --side: clamp(20px, 6vw, 104px);
-  --side-l: var(--side);
   --chrome: 38px;  /* hoogte tabbalk */
-  --status: 26px;  /* hoogte statusbalk */
   --pad: clamp(3.5rem, 7vw, 7rem);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --bg: #f5f0e6;
-  --ink: #1d1c1a;
-  --ink-2: #4a4741;
-  --muted: #6b675f;
-  --line: rgba(29, 28, 26, 0.5);
-  --hair: rgba(29, 28, 26, 0.15);
-  --panel: rgba(255, 255, 255, 0.5);
+  /* Solarized Light */
+  --bg: #fdf6e3;       /* base3 */
+  --bg-2: #eee8d5;     /* base2: balken en panelen */
+  --ink: #073642;      /* base02: koppen en nadruk */
+  --ink-2: #586e75;    /* base01: lopende tekst */
+  --muted: #7c8f93;    /* commentaar (iets donkerder dan base1, voor leesbaarheid) */
+  --line: rgba(7, 54, 66, 0.45);
+  --hair: rgba(7, 54, 66, 0.14);
+  --panel: rgba(238, 232, 213, 0.55);
 }
 
 *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
@@ -58,19 +58,21 @@ button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px dashed currentColor; outline-offset: 3px; }
 ::selection { background: var(--accent); color: #fff; }
 
-.wrap { max-width: 1440px; margin: 0 auto; padding: 0 var(--side) 0 var(--side-l); }
-.field { color: var(--ink); } /* transparant: de regelnummers eronder blijven zichtbaar */
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 var(--side); }
+.field { color: var(--ink-2); }
 
 .giant, .head, .footer-mark {
-  font-family: var(--font-head); font-weight: 800; font-variation-settings: 'wdth' 87.5;
-  letter-spacing: -0.035em; line-height: 0.98;
+  font-family: var(--font-head); font-weight: 800; color: var(--ink);
+  letter-spacing: -0.045em; line-height: 1.02;
 }
+/* titels als Markdown-koppen */
+.giant::before, .head::before { content: '# '; color: var(--muted); font-weight: 400; letter-spacing: -0.06em; }
 /* grote cijfers en woorden: teksteditor-letter, vet */
 .wordmark, .game-q, .exam-num, .fill-num, .score b, .rai-big, .verdict-label {
-  font-family: var(--font); font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+  font-family: var(--font); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: var(--ink);
 }
-.giant { font-size: var(--step-giant); text-transform: uppercase; }
-.head { font-size: var(--step-head); text-transform: uppercase; text-wrap: balance; }
+.giant { font-size: var(--step-giant); }
+.head { font-size: var(--step-head); text-wrap: balance; }
 h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.04em; }
 .lead { font-size: var(--step-lead); line-height: 1.5; max-width: 40ch; color: var(--ink); }
 .fine { font-size: var(--step-small); color: var(--ink-2); max-width: 60ch; }
@@ -82,7 +84,7 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
   font-size: var(--step-small); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-2);
 }
 .sec-label::after { content: ''; flex: 1; border-top: 1px dashed var(--line); }
-.sec-label { text-transform: none; letter-spacing: 0.02em; color: var(--muted); }
+.sec-label { text-transform: none; letter-spacing: 0; color: var(--muted); font-style: italic; }
 
 .button {
   display: inline-flex; align-items: center; gap: 0.6em; min-height: 2.9rem; padding: 0 1.2rem;
@@ -106,14 +108,13 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 
 /* ---------- IDE: tabbalk, regelnummers, statusbalk ---------- */
-body { padding-bottom: var(--status); }
 .ide-top {
   position: sticky; top: 0; z-index: 30; height: var(--chrome);
-  display: flex; align-items: stretch; background: #ebe4d6; border-bottom: 1px solid var(--line);
+  display: flex; align-items: stretch; background: var(--bg-2); border-bottom: 1px solid var(--line);
 }
 .ide-title { display: flex; align-items: center; padding: 0 16px; font-size: var(--step-small); font-weight: 700; white-space: nowrap; border-right: 1px solid var(--hair); }
 .ide-title .dim { color: var(--muted); font-weight: 400; }
-.tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
+.tabs { display: flex; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tabs a {
   display: flex; align-items: center; gap: 6px; padding: 0 14px; border-right: 1px solid var(--hair);
@@ -125,34 +126,23 @@ body { padding-bottom: var(--status); }
 .tabs a[aria-current="page"] { background: var(--bg); color: var(--ink); font-weight: 700; border-top-color: var(--accent); }
 .tabs a[aria-current="page"]::before { background: var(--accent); }
 
-.gutter {
-  position: absolute; top: 0; left: 0; z-index: 0; width: 56px; overflow: hidden; pointer-events: none;
-  padding-right: 12px; text-align: right; white-space: pre;
-  font: 11px / 24px var(--font); color: rgba(29, 28, 26, 0.28);
-  border-right: 1px solid var(--hair); font-variant-numeric: tabular-nums;
+.hdr-status {
+  display: flex; flex: none; align-items: center; gap: 6px; padding: 0 16px; border-left: 1px solid var(--hair); background: var(--bg-2);
+  font-size: var(--step-small); white-space: nowrap; color: var(--ink-2);
 }
-@media (min-width: 761px) { :root { --side-l: max(96px, 6vw); } }
-@media (max-width: 760px) { .gutter { display: none; } }
-
-.statusbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; height: var(--status);
-  display: flex; align-items: center; gap: 18px; padding: 0 14px;
-  background: var(--accent); color: #fff; font-size: 0.72rem; white-space: nowrap; overflow: hidden;
-}
-.sb-right { display: flex; gap: 18px; margin-left: auto; }
-#status::before { content: '○ '; }
-#status[data-state="ready"]::before { content: '● '; color: #8ff0a0; }
-#status[data-state="fallback"]::before, #status[data-state="error"]::before { content: '▲ '; color: #ffc2bb; }
+.hdr-status::before { content: '○'; color: var(--muted); }
+.hdr-status[data-state="ready"]::before { content: '●'; color: var(--good); }
+.hdr-status[data-state="fallback"]::before, .hdr-status[data-state="error"]::before { content: '▲'; color: var(--bad); }
 
 /* ---------- hero ---------- */
-.hero { min-height: calc(100svh - var(--chrome) - var(--status)); display: flex; flex-direction: column; overflow: hidden; }
+.hero { min-height: calc(100svh - var(--chrome)); display: flex; flex-direction: column; overflow: hidden; }
 .hero-main {
   flex: 1; display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: center;
-  max-width: 1440px; width: 100%; margin: 0 auto; padding: 4vh var(--side) 4vh var(--side-l);
+  max-width: 1440px; width: 100%; margin: 0 auto; padding: 4vh var(--side);
 }
 .hero-side { display: grid; gap: 18px; justify-items: start; border-left: 1px dashed var(--line); padding-left: 20px; }
 .hero-side .fine::before { content: '// '; }
-.hero-bins { max-width: 1440px; width: 100%; margin: 0 auto; padding: 0 var(--side) 0 var(--side-l); }
+.hero-bins { max-width: 1440px; width: 100%; margin: 0 auto; padding: 0 var(--side); }
 .hero-bins .bins { gap: clamp(8px, 2.4vw, 32px); }
 .hero-bins .bin-body { height: clamp(110px, 22vh, 210px); }
 .hero-bins .bin-lid { height: 16px; }
@@ -485,7 +475,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 @media (max-width: 560px) {
   .hero-main { align-content: center; gap: 28px; }
   .ide-title { display: none; }
-  .sb-right { display: none; }
+  .hdr-status { font-size: 0; padding: 0 12px; }
+  .hdr-status::before { font-size: 0.8rem; }
   .lab, .lab-verdicts, .rai { grid-template-columns: 1fr; }
   .rai-tile { min-height: 0; }
   .squares { gap: 1px; }

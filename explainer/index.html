@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Welke bak?</title>
   <meta name="description" content="Sorteer afval tegen twee AI-modellen. Zie hoe een zelf getraind CNN kijkt, hoe vaak het gelijk heeft en wanneer het overtuigd de mist in gaat.">
-  <meta name="theme-color" content="#f5f0e6">
+  <meta name="theme-color" content="#eee8d5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,600..800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
-  <div class="gutter" id="gutter" aria-hidden="true"></div>
   <header class="ide-top">
     <span class="ide-title">welke-bak<span class="dim">/explainer</span></span>
     <nav class="tabs" aria-label="Onderdelen">
@@ -29,6 +28,7 @@
       <a href="#vragen" data-tab="vragen">vragen.md</a>
       <a href="#over" data-tab="over">colofon.md</a>
     </nav>
+    <span class="hdr-status" id="status" data-state="loading" role="status">laden…</span>
   </header>
   <!-- HERO -->
   <header class="hero field" id="top">
@@ -294,12 +294,6 @@
       </div>
     </div>
   </footer>
-
-  <div class="statusbar">
-    <span>⎇ main</span>
-    <span id="status" data-state="loading" role="status">Laden…</span>
-    <span class="sb-right"><span id="sb-file">README.md</span><span>UTF-8</span><span>LF</span><span>nl-NL</span></span>
-  </div>
 
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
 </body>
