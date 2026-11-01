@@ -25,8 +25,9 @@ from preprocess import (CLASSES, ROOT, SEED, WasteDataset, class_counts,
                         eval_transform, load_split, train_transform)
 
 DEFAULTS = {
-    # 40 epochs onderfitte nog (val bal. acc 0,727, curve nog stijgend); 100 haalt 0,784
-    "cnn": {"epochs": 100, "lr": 2e-3},
+    # Val bal. acc: 40 epochs 0,727 (onderfit), 100 epochs 0,784, 200 epochs 0,796 (vlakt af)
+    "cnn": {"epochs": 200, "lr": 2e-3},
+    # 15 epochs 0,907; 30 epochs 0,903, dus langer helpt niet
     "mobilenet": {"epochs": 15, "lr": 5e-4},
 }
 
