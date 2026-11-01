@@ -466,11 +466,19 @@ function rgbToImageData(rgb, size) {
   return img;
 }
 
+// Kanaalkleuren zijn functioneel: ze laten zien welk getal bij welke kleur hoort
+const CHANNELS = [
+  { name: 'rood', short: 'R', color: '#e03131' },
+  { name: 'groen', short: 'G', color: '#2f9e44' },
+  { name: 'blauw', short: 'B', color: '#1c7ed6' },
+];
+
 function renderPixels(crop) {
   const size = state.data.image_size.cnn;
   $('#pixel-canvas').getContext('2d').putImageData(rgbToImageData(crop, size), 0, 0);
   state.pixelCrop = crop;
-  showPixel(size / 2, size / 2, false);
+  const [px, py] = state.pixel || [size / 2, size / 2];
+  showPixel(px, py);
 }
 
 function pixelHover(e) {
@@ -479,20 +487,33 @@ function pixelHover(e) {
   showPixel(
     Math.min(size - 1, Math.max(0, Math.floor(((e.clientX - rect.left) / rect.width) * size))),
     Math.min(size - 1, Math.max(0, Math.floor(((e.clientY - rect.top) / rect.height) * size))),
-    true,
   );
 }
 
-function showPixel(px, py, withText) {
+function showPixel(px, py) {
   const crop = state.pixelCrop;
   if (!crop) return;
+  state.pixel = [px, py];
   const size = state.data.image_size.cnn;
   const i = (py * size + px) * 3;
-  const [r, g, b] = [crop[i], crop[i + 1], crop[i + 2]];
-  if (withText) {
-    const norm = [r, g, b].map((v, c) => fmtNum((v / 255 - MEAN[c]) / STD[c], 2));
-    $('#pixel-info').innerHTML = `Pixel (${px}, ${py}): <b>${r}</b> · <b>${g}</b> · <b>${b}</b><br>het model krijgt ${norm.join(' · ')}`;
-  }
+  const values = [crop[i], crop[i + 1], crop[i + 2]];
+
+  const marker = $('#pixel-marker');
+  marker.style.left = `${(px / size) * 100}%`;
+  marker.style.top = `${(py / size) * 100}%`;
+  marker.style.width = marker.style.height = `${100 / size}%`;
+
+  $('#pixel-pos').innerHTML = `Pixel <b>x ${px}, y ${py}</b>`;
+  $('#pixel-channels').innerHTML = `
+    <div class="ch ch-head"><span>kanaal</span><span>0 – 255</span><span></span><span>model krijgt</span></div>
+    ${CHANNELS.map((ch, c) => `
+      <div class="ch">
+        <span class="ch-name"><i style="background:${ch.color}"></i>${ch.name}</span>
+        <span class="ch-bar"><i style="width:${(values[c] / 255) * 100}%;background:${ch.color}"></i></span>
+        <b class="mono">${values[c]}</b>
+        <span class="mono ch-model">${fmtNum((values[c] / 255 - MEAN[c]) / STD[c], 2)}</span>
+      </div>`).join('')}`;
+
   const patch = new ImageData(7, 7);
   for (let dy = -3; dy <= 3; dy++) {
     for (let dx = -3; dx <= 3; dx++) {
@@ -513,11 +534,18 @@ function renderFeatureMaps(tensor) {
   const n = size * size;
   const grid = $('#feature-maps');
   if (!grid.children.length) {
-    for (let o = 0; o < O; o++) grid.append(el('canvas', { width: size, height: size, 'data-tip': `Filter ${o + 1} van ${O}` }));
+    for (let o = 0; o < O; o++) {
+      const b = el('button', { type: 'button', class: 'fmap', 'aria-pressed': 'false', 'aria-label': `Filter ${o + 1}` },
+        `<canvas width="${size}" height="${size}"></canvas><span>#${String(o + 1).padStart(2, '0')}</span>`);
+      b.addEventListener('click', () => selectFilter(o));
+      grid.append(b);
+    }
   }
+  state.maps = [];
   const out = new Float32Array(n);
   for (let o = 0; o < O; o++) {
     let max = 0;
+    let active = 0;
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
         let s = bias[o];
@@ -535,6 +563,7 @@ function renderFeatureMaps(tensor) {
         const v = s > 0 ? s : 0;
         out[y * size + x] = v;
         if (v > max) max = v;
+        if (v > 0) active += 1;
       }
     }
     const img = new ImageData(size, size);
@@ -542,8 +571,46 @@ function renderFeatureMaps(tensor) {
       const g = max > 0 ? Math.round((out[p] / max) * 255) : 0;
       img.data.set([g, g, g, 255], p * 4);
     }
-    grid.children[o].getContext('2d').putImageData(img, 0, 0);
+    grid.children[o].querySelector('canvas').getContext('2d').putImageData(img, 0, 0);
+    state.maps.push({ img, active: active / n });
   }
+  // Eerste keer: toon het filter dat op deze foto het breedst reageert
+  if (state.filter === undefined) state.filter = argmax(state.maps.map((m) => m.active));
+  selectFilter(state.filter);
+}
+
+// Grote kaart + de echte 3x3-gewichten per kleurkanaal van één filter
+function selectFilter(o) {
+  state.filter = o;
+  const { shape, weight } = state.data.conv1;
+  const [, I, K] = shape;
+  const size = state.data.image_size.cnn;
+  const map = state.maps[o];
+  for (const [k, b] of [...$('#feature-maps').children].entries()) b.setAttribute('aria-pressed', String(k === o));
+
+  const w = (i, ky, kx) => weight[((o * I + i) * K + ky) * K + kx];
+  const all = Array.from({ length: I * K * K }, (_, j) => Math.abs(weight[o * I * K * K + j]));
+  const maxAbs = Math.max(...all) || 1;
+  const kernels = CHANNELS.map((ch, i) => `
+    <div class="kernel">
+      <p class="kernel-name"><i style="background:${ch.color}"></i>${ch.name}</p>
+      <div class="kernel-grid">${Array.from({ length: K * K }, (_, j) => {
+        const v = w(i, Math.floor(j / K), j % K);
+        const a = (Math.abs(v) / maxAbs) * 0.85;
+        const bg = v >= 0 ? `rgba(43,45,66,${a.toFixed(2)})` : `rgba(141,153,174,${a.toFixed(2)})`;
+        const ink = v >= 0 && a > 0.45 ? '#fff' : 'var(--ink)';
+        return `<span style="background:${bg};color:${ink}">${v >= 0 ? '+' : '−'}${fmtNum(Math.abs(v), 2)}</span>`;
+      }).join('')}</div>
+    </div>`).join('');
+
+  const detail = $('#filter-detail');
+  detail.innerHTML = `
+    <p class="filter-title">Filter #${String(o + 1).padStart(2, '0')}</p>
+    <canvas width="${size}" height="${size}" class="pixelated filter-big" aria-label="Kaart van filter ${o + 1}"></canvas>
+    <p class="fine">Reageert op <b>${fmtPct(map.active)}</b> van de pixels van deze foto${map.active === 0 ? ': dit patroon zit er niet in' : ''}.</p>
+    <p class="fine">Het patroon: 3 × 3 gewichten per kleur. <b>+</b> donker = die kleur op die plek maakt het filter sterker, <b>−</b> grijs = zwakker.</p>
+    <div class="kernels">${kernels}</div>`;
+  detail.querySelector('canvas').getContext('2d').putImageData(map.img, 0, 0);
 }
 
 // ---------- 3 data ----------
@@ -1057,6 +1124,7 @@ async function init() {
   renderRai();
   renderFaq();
   $('#pixel-canvas').addEventListener('pointermove', pixelHover);
+  $('#pixel-canvas').addEventListener('pointerdown', pixelHover); // ook tikken op een telefoon
 
   const first = state.data.examples.find((e) => !e.note && cls(e.label) === 'glas') || state.data.examples[0];
   await selectExample(first);

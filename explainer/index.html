@@ -79,29 +79,49 @@
           <p class="lead">Van foto naar oordeel in vier stappen. Dit is het eigen CNN, live op jouw foto.</p>
         </div>
         <div class="strip" data-thumbs></div>
-        <ol class="pipeline">
-          <li class="stage">
-            <div class="stage-visual"><canvas id="stage-photo" aria-label="De gekozen foto"></canvas></div>
-            <h3><span class="step">1</span> Foto</h3>
-            <p>Wat jij ziet.</p>
-          </li>
-          <li class="stage">
-            <div class="stage-visual pixel-wrap">
-              <canvas id="pixel-canvas" width="128" height="128" class="pixelated" aria-label="128 bij 128 pixels"></canvas>
-              <canvas id="pixel-zoom" width="7" height="7" class="pixelated zoom" aria-hidden="true"></canvas>
+        <ol class="kijk">
+          <!-- 1 + 2: foto en pixels -->
+          <li class="kijk-step kijk-pixels">
+            <div class="kijk-photo">
+              <h3><span class="step">1</span> Foto</h3>
+              <div class="stage-visual"><canvas id="stage-photo" aria-label="De gekozen foto"></canvas></div>
+              <p class="fine">Wat jij ziet.</p>
             </div>
-            <h3><span class="step">2</span> 49.152 getallen</h3>
-            <p id="pixel-info" class="mono">128 × 128 pixels × rood, groen, blauw. Beweeg over het beeld.</p>
+            <div class="kijk-grid">
+              <h3><span class="step">2</span> Wat het model krijgt: 128 × 128 pixels</h3>
+              <div class="pixel-panel">
+                <div class="stage-visual pixel-wrap">
+                  <canvas id="pixel-canvas" width="128" height="128" class="pixelated" aria-label="128 bij 128 pixels; beweeg of tik om één pixel te bekijken"></canvas>
+                  <span class="pixel-marker" id="pixel-marker" aria-hidden="true"></span>
+                </div>
+                <div class="pixel-readout">
+                  <p class="fine" id="pixel-pos">Beweeg of tik op het beeld.</p>
+                  <div id="pixel-channels" class="channels"></div>
+                  <div class="zoom-wrap">
+                    <canvas id="pixel-zoom" width="7" height="7" class="pixelated zoom" aria-hidden="true"></canvas>
+                    <p class="fine">Ingezoomd: 7 × 7 pixels rond je cursor.</p>
+                  </div>
+                  <p class="fine">Elke pixel is <b>3 getallen</b>: hoeveel rood, groen en blauw (0 = niets, 255 = vol). 128 × 128 × 3 = <b>49.152 getallen</b>. Het model krijgt ze geschaald rond 0.</p>
+                </div>
+              </div>
+            </div>
           </li>
-          <li class="stage">
-            <div class="stage-visual"><div id="feature-maps" class="feature-maps" aria-label="32 filterkaarten"></div></div>
-            <h3><span class="step">3</span> 32 filters</h3>
-            <p>Elk filter zoekt één patroon. Licht = gevonden. Het model leerde ze zelf.</p>
+          <!-- 3: filters -->
+          <li class="kijk-step">
+            <h3><span class="step">3</span> Laag 1: 32 filters</h3>
+            <p class="fine kijk-intro">Elk filter is een raampje van 3 × 3 pixels dat over de foto schuift en één patroon zoekt, zoals een rand of een kleurovergang. Het model leerde ze zelf. Hoe lichter de kaart, hoe sterker het filter daar reageert. Klik op een kaart.</p>
+            <div class="filters-panel">
+              <div id="feature-maps" class="feature-maps" role="group" aria-label="32 filterkaarten"></div>
+              <aside class="filter-detail" id="filter-detail" aria-live="polite"></aside>
+            </div>
           </li>
-          <li class="stage">
-            <div class="stage-visual verdict-visual" id="stage-verdict"></div>
-            <h3><span class="step">4</span> Oordeel</h3>
-            <p>Na nog drie lagen: vijf percentages. Het hoogste wint.</p>
+          <!-- 4: oordeel -->
+          <li class="kijk-step kijk-verdict">
+            <div>
+              <h3><span class="step">4</span> Oordeel</h3>
+              <p class="fine">Na laag 1 volgen nog drie lagen filters op steeds kleinere versies van het beeld. Daarna worden het vijf percentages. Het hoogste wint.</p>
+            </div>
+            <div class="verdict-visual" id="stage-verdict"></div>
           </li>
         </ol>
       </div>
