@@ -8,26 +8,30 @@
   <meta name="theme-color" content="#f5f0e6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@400..900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,600..800&family=JetBrains+Mono:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
+  <div class="gutter" id="gutter" aria-hidden="true"></div>
+  <header class="ide-top">
+    <span class="ide-title">welke-bak<span class="dim">/explainer</span></span>
+    <nav class="tabs" aria-label="Onderdelen">
+      <a href="#top" data-tab="top">README.md</a>
+      <a href="#spel" data-tab="spel">spel.js</a>
+      <a href="#machine" data-tab="machine">kijk.py</a>
+      <a href="#data" data-tab="data">data.csv</a>
+      <a href="#toets" data-tab="toets">toets.json</a>
+      <a href="#lab" data-tab="lab">lab.js</a>
+      <a href="#zeker" data-tab="zeker">zeker.md</a>
+      <a href="#rai" data-tab="rai">responsible-ai.md</a>
+      <a href="#vragen" data-tab="vragen">vragen.md</a>
+      <a href="#over" data-tab="over">colofon.md</a>
+    </nav>
+  </header>
   <!-- HERO -->
   <header class="hero field" id="top">
-    <nav class="bar" aria-label="Onderdelen">
-      <a class="wordmark" href="#top">Welke bak?</a>
-      <div class="bar-links">
-        <a href="#spel">Spel</a>
-        <a href="#machine">Hoe het kijkt</a>
-        <a href="#toets">Eindtoets</a>
-        <a href="#lab">Breek het</a>
-        <a href="#rai">Responsible AI</a>
-        <a href="#vragen">Vragen</a>
-      </div>
-      <span class="pill" id="status" data-state="loading" role="status">Laden…</span>
-    </nav>
     <div class="hero-main">
       <h1 class="giant">Welke<br>bak?</h1>
       <div class="hero-side">
@@ -43,7 +47,7 @@
     <!-- 1 SPEL -->
     <section class="chapter field" id="spel" aria-labelledby="spel-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[01] spel</p>
+        <p class="sec-label" aria-hidden="true">// 01 · spel.js</p>
         <div class="chapter-head">
           <h2 class="head" id="spel-title">Sorteer mee</h2>
           <p class="lead">Acht foto's die de AI's nooit zagen. Kies eerst zelf, dan zie je wat ze zeiden.</p>
@@ -69,7 +73,7 @@
     <!-- 2 MACHINE -->
     <section class="chapter field" id="machine" aria-labelledby="machine-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[02] hoe het kijkt</p>
+        <p class="sec-label" aria-hidden="true">// 02 · kijk.py</p>
         <div class="chapter-head">
           <h2 class="head" id="machine-title">Hoe het kijkt</h2>
           <p class="lead">Van foto naar oordeel in vier stappen. Dit is het eigen CNN, live op jouw foto.</p>
@@ -106,7 +110,7 @@
     <!-- 3 DATA -->
     <section class="chapter field" id="data" aria-labelledby="data-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[03] data</p>
+        <p class="sec-label" aria-hidden="true">// 03 · data.csv</p>
         <div class="chapter-head">
           <h2 class="head" id="data-title">Alles wat het zag</h2>
           <p class="lead"><span data-fill="n-images">2.527</span> foto's uit <a href="https://github.com/garythung/trashnet">TrashNet</a>. Eén vakje is één foto. Allemaal op wit papier, één voorwerp, iPhone.</p>
@@ -128,7 +132,7 @@
     <!-- 4 TOETS -->
     <section class="chapter field" id="toets" aria-labelledby="toets-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[04] eindtoets</p>
+        <p class="sec-label" aria-hidden="true">// 04 · toets.json</p>
         <div class="chapter-head">
           <h2 class="head" id="toets-title">De eindtoets</h2>
           <p class="lead"><span data-fill="n-test">380</span> nieuwe foto's. Eén vakje per foto.</p>
@@ -156,7 +160,7 @@
     <!-- 5 LAB -->
     <section class="chapter field" id="lab" aria-labelledby="lab-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[05] lab</p>
+        <p class="sec-label" aria-hidden="true">// 05 · lab.js</p>
         <div class="chapter-head">
           <h2 class="head" id="lab-title">Breek het</h2>
           <p class="lead">Echt afval ligt niet op wit papier. Draai aan de knoppen.</p>
@@ -184,7 +188,7 @@
     <!-- 6 ZEKER ≠ JUIST -->
     <section class="chapter field" id="zeker" aria-labelledby="zeker-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[06] zekerheid</p>
+        <p class="sec-label" aria-hidden="true">// 06 · zeker.md</p>
         <div class="moment">
           <img id="moment-img" alt="Tijdschriftpagina vol kleurige plaatjes" src="../assets/examples/paper93.jpg">
           <div>
@@ -199,7 +203,7 @@
     <!-- 7 RESPONSIBLE AI -->
     <section class="chapter field" id="rai" aria-labelledby="rai-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[07] responsible ai</p>
+        <p class="sec-label" aria-hidden="true">// 07 · responsible-ai.md</p>
         <div class="chapter-head">
           <h2 class="head" id="rai-title">Responsible AI</h2>
           <p class="lead">Zes vragen om aan elk AI-systeem te stellen. Zo staat deze ervoor, gemeten.</p>
@@ -248,7 +252,7 @@
     <!-- 8 VRAGEN -->
     <section class="chapter field" id="vragen" aria-labelledby="vragen-title">
       <div class="wrap faq-wrap">
-        <p class="sec-label" aria-hidden="true">[08] meer weten</p>
+        <p class="sec-label" aria-hidden="true">// 08 · vragen.md</p>
         <h2 class="head" id="vragen-title">Meer weten</h2>
         <div class="faq">
           <details name="faq">
@@ -270,7 +274,7 @@
     <!-- 9 OVER -->
     <section class="chapter field" id="over" aria-labelledby="over-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">[09] colofon</p>
+        <p class="sec-label" aria-hidden="true">// 09 · colofon.md</p>
         <h2 class="head" id="over-title">Hoe het gemaakt is</h2>
         <p class="story">
           Ik ben <strong>Nguyen Anh Le</strong>, en ik heb dit gemaakt als persoonlijk artefact voor school: de learning group <mark class="m0">computer vision</mark> in het semester <mark class="m2">Responsible Applied AI</mark> van HBO-ICT aan de Hogeschool van Amsterdam. Ik wilde weten hoe goed een model dat ik <mark class="m1">zelf vanaf nul train</mark> afval kan herkennen, en vooral waar het misgaat. Dus heb ik een compact CNN met vier lagen filters getraind in <mark class="m4">PyTorch</mark>, op <span data-fill="n-images">2.527</span> foto's uit TrashNet. Ter vergelijking heb ik een voorgetraind MobileNet, dat ImageNet al kende, kort bijgetraind op dezelfde foto's. Beide modellen draaien via <mark class="m4">ONNX Runtime Web</mark> in je browser, met <mark class="m3">tot op de pixel</mark> dezelfde voorbewerking als in Python. Elke score op deze pagina heb ik gemeten op <span data-fill="n-test">380</span> testfoto's die geen van beide modellen eerder zag.
@@ -290,6 +294,12 @@
       </div>
     </div>
   </footer>
+
+  <div class="statusbar">
+    <span>⎇ main</span>
+    <span id="status" data-state="loading" role="status">Laden…</span>
+    <span class="sb-right"><span id="sb-file">README.md</span><span>UTF-8</span><span>LF</span><span>nl-NL</span></span>
+  </div>
 
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
 </body>

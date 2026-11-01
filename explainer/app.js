@@ -970,6 +970,38 @@ async function runParityCheck() {
   document.body.dataset.parity = JSON.stringify({ exactPer, same, total, maxDiff });
 }
 
+// ---------- IDE: regelnummers en actieve tab ----------
+
+const LINE_HEIGHT = 24; // gelijk aan .gutter line-height in styles.css
+
+function renderGutter() {
+  const g = $('#gutter');
+  g.style.height = '0px'; // eerst weg, anders meet hij zijn eigen hoogte mee
+  const h = document.documentElement.scrollHeight;
+  g.style.height = `${h}px`;
+  g.textContent = Array.from({ length: Math.ceil(h / LINE_HEIGHT) }, (_, i) => i + 1).join('\n');
+}
+
+function setupIde() {
+  let timer;
+  new ResizeObserver(() => {
+    clearTimeout(timer);
+    timer = setTimeout(renderGutter, 120);
+  }).observe(document.body);
+
+  const tabs = new Map([...document.querySelectorAll('[data-tab]')].map((a) => [a.dataset.tab, a]));
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      for (const a of tabs.values()) a.removeAttribute('aria-current');
+      const tab = tabs.get(entry.target.id);
+      tab.setAttribute('aria-current', 'page');
+      $('#sb-file').textContent = tab.textContent;
+    }
+  }, { rootMargin: '-45% 0px -54% 0px' });
+  for (const id of tabs.keys()) observer.observe(document.getElementById(id));
+}
+
 // ---------- start ----------
 
 async function loadModels() {
@@ -987,7 +1019,7 @@ async function loadModels() {
     setLive(false);
     return;
   }
-  setStatus('ready', 'Modellen draaien in je browser');
+  setStatus('ready', 'modellen geladen · draaien in je browser');
   setLive(true);
   if (state.source?.example) await selectExample(state.source.example);
   runParityCheck();
@@ -1004,6 +1036,7 @@ window.addEventListener('resize', () => {
 });
 
 async function init() {
+  setupIde();
   try {
     const [data, hc, hm, ec, em, variations, onnx] = await Promise.all([
       loadJSON('data/web.json'),
