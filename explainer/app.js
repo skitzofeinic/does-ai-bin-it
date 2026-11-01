@@ -588,10 +588,10 @@ function selectFilter(o) {
       <div class="kernel-grid">${Array.from({ length: K * K }, (_, j) => {
         const v = w(i, Math.floor(j / K), j % K);
         const a = (Math.abs(v) / maxAbs) * 0.85;
-        // + = licht vlak (hoe sterker, hoe lichter), − = gestippelde rand
+        // + = donker vlak (hoe sterker, hoe donkerder), − = gestippelde rand
         const style = v >= 0
-          ? `background:rgba(237,242,244,${a.toFixed(2)});color:${a > 0.45 ? '#2b2d42' : 'var(--ink)'}`
-          : `border:1px dashed rgba(237,242,244,${(0.25 + a * 0.75).toFixed(2)});color:var(--ink-2)`;
+          ? `background:rgba(13,13,13,${a.toFixed(2)});color:${a > 0.45 ? '#ffffff' : 'var(--ink)'}`
+          : `border:1px dashed rgba(13,13,13,${(0.25 + a * 0.75).toFixed(2)});color:var(--ink-2)`;
         return `<span style="${style}">${v >= 0 ? '+' : '−'}${fmtNum(Math.abs(v), 2)}</span>`;
       }).join('')}</div>
     </div>`).join('');
@@ -601,7 +601,7 @@ function selectFilter(o) {
     <p class="filter-title">Filter #${String(o + 1).padStart(2, '0')}</p>
     <canvas width="${size}" height="${size}" class="pixelated filter-big" aria-label="Kaart van filter ${o + 1}"></canvas>
     <p class="fine">Reageert op <b>${fmtPct(map.active)}</b> van de pixels van deze foto${map.active === 0 ? ': dit patroon zit er niet in' : ''}.</p>
-    <p class="fine">Het patroon: 3 × 3 gewichten per kleur. <b>+</b> licht vlak = die kleur op die plek maakt het filter sterker, <b>−</b> gestippeld = zwakker.</p>
+    <p class="fine">Het patroon: 3 × 3 gewichten per kleur. <b>+</b> donker vlak = die kleur op die plek maakt het filter sterker, <b>−</b> gestippeld = zwakker.</p>
     <div class="kernels">${kernels}</div>`;
   detail.querySelector('canvas').getContext('2d').putImageData(map.img, 0, 0);
 }
