@@ -1,21 +1,21 @@
 /* Welke bak? Ontwerp: gebroken wit papier, teksteditor-letter (JetBrains Mono), Doto alleen voor titels,
-   geen afrondingen, 1px-lijnen. Eén gedempte accentkleur (indigo). Andere kleur alleen als die een
-   functie heeft: bakkleuren (welke bak), groen (goed, actief, geladen) en rood (fout).
-   Bakkleuren: de gevalideerde set, 30% naar warm grijs gemengd; opnieuw gevalideerd (dataviz-validator,
-   alle paren, op --bg). Elke bak draagt altijd zijn naam.
+   geen afrondingen, 1px-lijnen. Eén accentkleur (violet-indigo, anders dan de blauwe papierbak).
+   Andere kleur alleen als die een functie heeft: bakkleuren (welke bak), groen (goed, actief,
+   geladen) en rood (fout). Bakkleuren gevalideerd (dataviz-validator, alle paren, op --bg);
+   elke bak draagt altijd zijn naam, dus de waarschuwingen (geel contrast, rood/groen 7,2) zijn gedekt.
    Modellen zonder kleur: eigen CNN = doorgetrokken en dicht, MobileNet = gestippeld en open. */
 :root {
   color-scheme: light;
-  --accent: #3a44a0;
+  --accent: #5a3ee0;
 
-  --bin-0: #477cbc;  /* papier en karton */
-  --bin-1: #298426;  /* glas */
-  --bin-2: #cf9926;  /* plastic */
-  --bin-3: #c85b59;  /* metaal */
-  --bin-4: #5a5650;  /* restafval */
+  --bin-0: #2a78d6;  /* papier en karton */
+  --bin-1: #008300;  /* glas */
+  --bin-2: #eda100;  /* plastic */
+  --bin-3: #e34948;  /* metaal */
+  --bin-4: #4a4a4a;  /* restafval */
 
-  --good: #2f7d32;
-  --bad: #b03a2e;
+  --good: #1f8a2b;
+  --bad: #c8352b;
 
   --font-head: 'Doto', 'JetBrains Mono', monospace;
   --font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
