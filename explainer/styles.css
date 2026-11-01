@@ -1,5 +1,5 @@
-/* Welke bak? Ontwerp: een IDE, licht. Gebroken wit scherm, zwarte tekst en balken (tweede kleur),
-   fel rood als enige accent. Tekst in JetBrains Mono, titels in IBM Plex Mono Bold, h1 in hoofdletters.
+/* Welke bak? Ontwerp: een IDE, licht. Warm wit scherm, zwarte tekst, zwarte voet en knoppen (tweede kleur),
+   fel rood als enige accent. De tabbalk heeft de paginakleur met een streep eronder. Tekst in JetBrains Mono, titels in IBM Plex Mono Bold, h1 in hoofdletters.
    Geen afrondingen, 1px-lijnen, inhoud over de volle breedte. Animaties zonder easing (steps()),
    het deksel van een bak is open of dicht, zonder tussenstand.
    Kleur buiten het palet alleen als die een functie heeft: bakkleuren (welke bak), groen (goed,
@@ -10,10 +10,10 @@
    Modellen zonder kleur: eigen CNN = doorgetrokken en dicht, MobileNet = gestippeld en open. */
 :root {
   color-scheme: light;
-  --accent: #d90429;      /* fel rood */
+  --accent: #ef233c;      /* fel rood */
   --accent-ink: #ffffff;  /* tekst op rood */
   --second: #000000;      /* zwart: balken, knoppen, tegels */
-  --accent-deep: #d90429; /* functioneel: overtuigd fout */
+  --accent-deep: #ef233c; /* functioneel: overtuigd fout */
 
   --bin-0: #0070cd;  /* papier en karton */
   --bin-1: #64ccc9;  /* glas */
@@ -22,7 +22,7 @@
   --bin-4: #646469;  /* restafval */
 
   --good: #1f7a2e;
-  --bad: #d90429;
+  --bad: #e0182f;
 
   --font-head: 'IBM Plex Mono', 'JetBrains Mono', monospace;
   --font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -36,8 +36,8 @@
   --pad: clamp(3.5rem, 7vw, 7rem);
   --ease: steps(4, end);  /* schokkerig: geen easing */
 
-  --bg: #edf2f4;       /* gebroken wit */
-  --bg-2: #e2e8eb;
+  --bg: #f7f2ea;       /* warm wit */
+  --bg-2: #efe8dc;
   --ink: #0d0d0d;      /* bijna zwart: koppen en nadruk */
   --ink-2: #2b2d42;    /* lopende tekst */
   --muted: #5c6578;    /* commentaar */
@@ -109,31 +109,31 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
 .seg button + button { border-left: 1px solid var(--line); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 
-/* ---------- IDE: tabbalk, regelnummers, statusbalk ---------- */
+/* ---------- IDE: tabbalk, in dezelfde kleur als de pagina, met een streep eronder ---------- */
 .ide-top {
   position: sticky; top: 0; z-index: 30; height: var(--chrome);
-  display: flex; align-items: stretch; background: var(--second); color: #edf2f4; border-bottom: 1px solid var(--hair);
+  display: flex; align-items: stretch; background: var(--bg); color: var(--ink); border-bottom: 1px solid var(--ink);
 }
-.ide-title { display: flex; align-items: center; padding: 0 16px; font-size: var(--step-small); font-weight: 700; white-space: nowrap; border-right: 1px solid rgba(237, 242, 244, 0.15); }
-.ide-title .dim { color: #8d99ae; font-weight: 400; }
+.ide-title { display: flex; align-items: center; padding: 0 16px; font-size: var(--step-small); font-weight: 700; white-space: nowrap; border-right: 1px solid var(--hair); }
+.ide-title .dim { color: var(--muted); font-weight: 400; }
 .tabs { display: flex; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tabs a {
-  display: flex; align-items: center; gap: 6px; padding: 0 14px; border-right: 1px solid rgba(237, 242, 244, 0.12);
-  font-size: var(--step-small); color: #8d99ae; text-decoration: none; white-space: nowrap;
-  border-top: 2px solid transparent;
+  display: flex; align-items: center; gap: 6px; padding: 0 14px; border-right: 1px solid var(--hair);
+  font-size: var(--step-small); color: var(--muted); text-decoration: none; white-space: nowrap;
+  border-bottom: 3px solid transparent;
 }
-.tabs a::before { content: ''; width: 7px; height: 7px; background: rgba(237, 242, 244, 0.25); }
-.tabs a:hover { background: #3a3d57; color: #edf2f4; }
-.tabs a[aria-current="page"] { background: var(--bg); color: var(--ink); font-weight: 700; border-top-color: var(--accent); }
+.tabs a::before { content: ''; width: 7px; height: 7px; background: var(--hair); }
+.tabs a:hover { color: var(--ink); border-bottom-color: var(--line); }
+.tabs a[aria-current="page"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--accent); }
 .tabs a[aria-current="page"]::before { background: var(--accent); }
 
 .hdr-status {
-  display: flex; flex: none; align-items: center; gap: 6px; padding: 0 16px; border-left: 1px solid rgba(237, 242, 244, 0.15); background: var(--second);
-  font-size: var(--step-small); white-space: nowrap; color: #edf2f4;
+  display: flex; flex: none; align-items: center; gap: 6px; padding: 0 16px; border-left: 1px solid var(--hair); background: var(--bg);
+  font-size: var(--step-small); white-space: nowrap; color: var(--ink-2);
 }
-.hdr-status::before { content: '○'; color: #8d99ae; }
-.hdr-status[data-state="ready"]::before { content: '●'; color: #5fd47a; }
+.hdr-status::before { content: '○'; color: var(--muted); }
+.hdr-status[data-state="ready"]::before { content: '●'; color: var(--good); }
 .hdr-status[data-state="fallback"]::before, .hdr-status[data-state="error"]::before { content: '▲'; color: var(--bad); }
 
 /* ---------- hero ---------- */
@@ -460,8 +460,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .faq summary::after { content: '[+]'; font-weight: 400; }
 .faq details[open] summary::after { content: '[-]'; }
 .faq p { margin-top: 10px; color: var(--ink-2); font-size: var(--step-small); }
-#parity[data-state="ok"]::before { content: '[ ok ] '; color: var(--good); font-weight: 700; }
-#parity[data-state="warn"]::before { content: '[ !! ] '; color: var(--bad); font-weight: 700; }
+#parity[data-state="ok"]::before { content: '● '; color: var(--good); }
+#parity[data-state="warn"]::before { content: '● '; color: var(--bad); }
 
 /* over */
 .story {
@@ -475,7 +475,11 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .story-end::before { content: '> '; }
 
 /* footer */
-.footer { padding: 4rem 0 3rem; }
+.footer {
+  padding: 4rem 0 3rem; background: var(--second);
+  --ink: #f7f2ea; --ink-2: #bfb9ae; --muted: #8f897f; --line: rgba(247, 242, 234, 0.35); --hair: rgba(247, 242, 234, 0.12);
+  color: var(--ink);
+}
 .footer-mark { font-size: clamp(2.4rem, 1rem + 5vw, 5.5rem); text-transform: uppercase; margin-bottom: 2rem; }
 .footer-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border-top: 1px solid var(--line); font-size: var(--step-small); }
 .footer-cols div { display: grid; gap: 4px; align-content: start; color: var(--ink-2); padding: 14px 14px 14px 0; }
