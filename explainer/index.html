@@ -255,11 +255,18 @@
             <summary>Rekent je browser hetzelfde als Python?</summary>
             <p id="parity" data-state="pending">Wordt gecontroleerd zodra de modellen geladen zijn…</p>
           </details>
-          <details name="faq">
-            <summary>Hoe is dit gemaakt?</summary>
-            <p>Het eigen CNN heeft vier lagen filters en is vanaf nul getraind in PyTorch op 1.768 foto's; de beste ronde is gekozen op 379 andere foto's. MobileNetV3-Small kende ImageNet al en is kort bijgetraind op dezelfde foto's, ter vergelijking. Beide zijn geëxporteerd naar ONNX en draaien met ONNX Runtime Web. Elke score op deze pagina is gemeten op 380 testfoto's die geen van beide modellen eerder zag.</p>
-          </details>
         </div>
+      </div>
+    </section>
+
+    <!-- 9 OVER -->
+    <section class="chapter field-paper" id="over" aria-labelledby="over-title">
+      <div class="wrap">
+        <h2 class="head" id="over-title">Hoe het gemaakt is</h2>
+        <p class="story">
+          Ik ben <strong>Nguyen Anh Le</strong>, en ik heb dit gemaakt als persoonlijk artefact voor school: de learning group <mark class="m0">computer vision</mark> in het semester <mark class="m2">Responsible Applied AI</mark> van HBO-ICT aan de Hogeschool van Amsterdam. Ik wilde weten hoe goed een model dat ik <mark class="m1">zelf vanaf nul train</mark> afval kan herkennen, en vooral waar het misgaat. Dus heb ik een compact CNN met vier lagen filters getraind in <mark class="m4">PyTorch</mark>, op <span data-fill="n-images">2.527</span> foto's uit TrashNet. Ter vergelijking heb ik een voorgetraind MobileNet, dat ImageNet al kende, kort bijgetraind op dezelfde foto's. Beide modellen draaien via <mark class="m4">ONNX Runtime Web</mark> in je browser, met <mark class="m3">tot op de pixel</mark> dezelfde voorbewerking als in Python. Elke score op deze pagina heb ik gemeten op <span data-fill="n-test">380</span> testfoto's die geen van beide modellen eerder zag.
+          <a class="story-end" href="#spel">Speel nog een keer.</a>
+        </p>
       </div>
     </section>
   </main>
@@ -270,7 +277,7 @@
       <div class="footer-cols">
         <div><h3>Data</h3><a href="https://github.com/garythung/trashnet">TrashNet</a><span>Gary Thung &amp; Mindy Yang, 2017</span></div>
         <div><h3>Modellen</h3><span>Eigen CNN, PyTorch</span><span>MobileNetV3-Small, torchvision</span><span>ONNX Runtime Web</span></div>
-        <div><h3>Gemaakt door</h3><span>Anh</span><span>Responsible Applied AI, HvA</span></div>
+        <div><h3>Gemaakt door</h3><span>Nguyen Anh Le</span><span>Learning group computer vision</span><span>Responsible Applied AI, HBO-ICT, HvA</span></div>
       </div>
     </div>
   </footer>

@@ -365,6 +365,20 @@ table.data thead th { color: var(--ink-2); font-weight: 600; }
 #parity[data-state="ok"]::before { content: '✓ '; color: var(--good); font-weight: 700; }
 #parity[data-state="warn"]::before { content: '! '; color: var(--bad); font-weight: 700; }
 
+/* over */
+.story {
+  max-width: 34em; margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(1.25rem, 1.05rem + 1vw, 2rem); line-height: 1.45; letter-spacing: -0.01em;
+}
+.story strong { font-weight: 800; }
+.story mark { padding: 0.02em 0.25em; border-radius: 0.25em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.story .m0 { background: var(--bin-0); color: var(--bin-0-ink); }
+.story .m1 { background: var(--bin-1); color: var(--bin-1-ink); }
+.story .m2 { background: var(--bin-2); color: var(--bin-2-ink); }
+.story .m3 { background: var(--bin-3); color: var(--bin-3-ink); }
+.story .m4 { background: var(--ink); color: var(--paper); }
+.story-end { display: inline-block; margin-left: 0.3em; font-weight: 800; text-underline-offset: 0.18em; }
+
 /* footer */
 .footer { padding: 4rem 0 3rem; }
 .footer-mark { font-size: clamp(3rem, 1rem + 9vw, 9rem); margin-bottom: 2rem; }
