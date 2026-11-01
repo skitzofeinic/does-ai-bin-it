@@ -1,0 +1,187 @@
+{
+ "n_test": 380,
+ "classes": [
+  "papier en karton",
+  "glas",
+  "plastic",
+  "metaal",
+  "restafval"
+ ],
+ "experiments": [
+  {
+   "name": "licht",
+   "unit": "x helderheid",
+   "neutral": 1.0,
+   "results": [
+    {
+     "level": 0.25,
+     "accuracy": {
+      "cnn": 0.3368,
+      "mobilenet": 0.7
+     }
+    },
+    {
+     "level": 0.5,
+     "accuracy": {
+      "cnn": 0.5632,
+      "mobilenet": 0.9105
+     }
+    },
+    {
+     "level": 0.75,
+     "accuracy": {
+      "cnn": 0.7921,
+      "mobilenet": 0.9132
+     }
+    },
+    {
+     "level": 1.0,
+     "accuracy": {
+      "cnn": 0.7947,
+      "mobilenet": 0.9079
+     }
+    },
+    {
+     "level": 1.5,
+     "accuracy": {
+      "cnn": 0.7263,
+      "mobilenet": 0.8921
+     }
+    },
+    {
+     "level": 2.0,
+     "accuracy": {
+      "cnn": 0.5289,
+      "mobilenet": 0.7895
+     }
+    }
+   ]
+  },
+  {
+   "name": "draaien",
+   "unit": "graden",
+   "neutral": 0,
+   "results": [
+    {
+     "level": 0,
+     "accuracy": {
+      "cnn": 0.7947,
+      "mobilenet": 0.9079
+     }
+    },
+    {
+     "level": 15,
+     "accuracy": {
+      "cnn": 0.7842,
+      "mobilenet": 0.9079
+     }
+    },
+    {
+     "level": 30,
+     "accuracy": {
+      "cnn": 0.7711,
+      "mobilenet": 0.8763
+     }
+    },
+    {
+     "level": 45,
+     "accuracy": {
+      "cnn": 0.7368,
+      "mobilenet": 0.8395
+     }
+    },
+    {
+     "level": 90,
+     "accuracy": {
+      "cnn": 0.7553,
+      "mobilenet": 0.9079
+     }
+    },
+    {
+     "level": 180,
+     "accuracy": {
+      "cnn": 0.7737,
+      "mobilenet": 0.9158
+     }
+    }
+   ]
+  },
+  {
+   "name": "vervagen",
+   "unit": "px straal",
+   "neutral": 0,
+   "results": [
+    {
+     "level": 0,
+     "accuracy": {
+      "cnn": 0.7947,
+      "mobilenet": 0.9079
+     }
+    },
+    {
+     "level": 2,
+     "accuracy": {
+      "cnn": 0.7763,
+      "mobilenet": 0.8868
+     }
+    },
+    {
+     "level": 4,
+     "accuracy": {
+      "cnn": 0.5605,
+      "mobilenet": 0.7816
+     }
+    },
+    {
+     "level": 8,
+     "accuracy": {
+      "cnn": 0.3421,
+      "mobilenet": 0.6105
+     }
+    },
+    {
+     "level": 16,
+     "accuracy": {
+      "cnn": 0.2842,
+      "mobilenet": 0.4
+     }
+    }
+   ]
+  },
+  {
+   "name": "kleiner op donker",
+   "unit": "x formaat",
+   "neutral": 1.0,
+   "results": [
+    {
+     "level": 1.0,
+     "accuracy": {
+      "cnn": 0.7947,
+      "mobilenet": 0.9079
+     }
+    },
+    {
+     "level": 0.75,
+     "accuracy": {
+      "cnn": 0.6026,
+      "mobilenet": 0.9
+     }
+    },
+    {
+     "level": 0.5,
+     "accuracy": {
+      "cnn": 0.4632,
+      "mobilenet": 0.7684
+     }
+    },
+    {
+     "level": 0.35,
+     "accuracy": {
+      "cnn": 0.4053,
+      "mobilenet": 0.5184
+     }
+    }
+   ]
+  }
+ ]
+}

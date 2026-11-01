@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welke bak? · Waste Recycle Classifier</title>
+  <meta name="description" content="Interactieve uitleg: hoe een zelf getraind beeldmodel afval sorteert, hoe goed het is en waar het de mist in gaat.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Responsible Applied AI · persoonlijk artefact van Anh</p>
+      <h1>Welke bak?</h1>
+      <p class="lead">Een AI kijkt naar een foto van afval en kiest één van vijf soorten: papier en karton, glas, plastic, metaal of restafval. Hier zie je hoe hij dat leerde, hoe vaak hij gelijk heeft, en wanneer hij overtuigd de mist in gaat.</p>
+      <p class="callout"><strong>Lesvoorbeeld, geen afvalwijzer.</strong> Wat in welke bak mag, verschilt per gemeente. Twijfel je, kijk dan op de website van je gemeente.</p>
+      <p id="status" class="status" data-state="loading" role="status">Gegevens laden…</p>
+      <nav class="toc" aria-label="Onderdelen">
+        <a href="#leer">1 Leer</a>
+        <a href="#train">2 Train</a>
+        <a href="#probeer">3 Probeer</a>
+        <a href="#test">4 Test</a>
+        <a href="#reflecteer">5 Reflecteer</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- 1 LEER -->
+    <section id="leer">
+      <h2><span class="num">1</span> Leer: hoe een computer een foto ziet</h2>
+      <p><em>Computer vision</em> is het vakgebied waarin computers leren iets te zeggen over beelden. Deze AI doet <em>beeldclassificatie</em>: hij krijgt één foto en kiest één label uit een vaste lijst. Hij ziet geen "fles" of "blik", alleen getallen.</p>
+
+      <h3>Een foto is een tabel met getallen</h3>
+      <p>Het eigen model maakt van elke foto een vierkant van 128 × 128 pixels. Elke pixel bestaat uit drie getallen tussen 0 en 255: rood, groen en blauw. Samen zijn dat <strong>49.152 getallen</strong>. Beweeg over het beeld om ze te zien.</p>
+      <div class="pixel-explorer">
+        <canvas id="pixel-canvas" width="128" height="128" class="pixelated" aria-label="De foto zoals het eigen model hem krijgt: 128 bij 128 pixels"></canvas>
+        <div class="pixel-readout">
+          <canvas id="pixel-zoom" width="7" height="7" class="pixelated" aria-hidden="true"></canvas>
+          <p id="pixel-info" class="mono">Beweeg over de foto</p>
+          <p class="muted small">Het model krijgt deze getallen niet ruw: het trekt er een gemiddelde van af en deelt door de spreiding, zodat ze rond 0 liggen.</p>
+        </div>
+      </div>
+
+      <h3>Filters: wat de eerste laag ziet</h3>
+      <p>Een <em>convolutional neural network</em> (CNN) schuift kleine filters van 3 × 3 pixels over de foto. Elk filter zoekt één simpel patroon, zoals een rand, een kleurovergang of een licht vlak. Het model heeft die filters niet van ons gekregen: het leerde ze zelf tijdens het trainen. Hieronder zie je wat de <strong>32 echte filters</strong> van de eerste laag van het eigen model van de gekozen foto maken. Licht betekent: hier reageert dit filter sterk.</p>
+      <div id="feature-maps" class="feature-maps" aria-label="32 uitkomsten van de eerste laag"></div>
+      <p class="muted small">Sommige filters blijven bijna overal donker. Die reageren op een patroon dat in deze foto nauwelijks voorkomt.</p>
+
+      <h3>Van getallen naar een oordeel</h3>
+      <ol class="steps">
+        <li><strong>Laag 1 tot 4</strong>: steeds meer filters (32, 64, 128, 256) op steeds kleinere versies van het beeld. Vroege lagen zien randen, latere lagen combinaties zoals "glanzend en rond".</li>
+        <li><strong>Samenvatten</strong>: per filter één gemiddelde over het hele beeld, dus 256 getallen.</li>
+        <li><strong>Kiezen</strong>: een laatste rekenstap maakt daar vijf scores van, één per soort afval.</li>
+        <li><strong>Zekerheid</strong>: de scores worden percentages die samen 100% zijn. Dat percentage zegt hoe zeker het model is, <em>niet</em> hoe vaak het klopt.</li>
+      </ol>
+    </section>
+
+    <!-- 2 TRAIN -->
+    <section id="train">
+      <h2><span class="num">2</span> Train: leren van <span data-fill="n-images">2.527</span> foto's</h2>
+      <p>De foto's komen uit <a href="https://github.com/garythung/trashnet">TrashNet</a> (Thung &amp; Yang, 2017): één voorwerp per foto, op wit posterpapier, met daglicht of lamplicht, gemaakt met een iPhone. Papier en karton zijn hier samengevoegd, omdat ze in dezelfde bak gaan.</p>
+      <div class="chart-block">
+        <h4>Foto's per soort</h4>
+        <div id="chart-dataset" class="hbars"></div>
+        <details class="table-view"><summary>Toon als tabel</summary><div id="table-dataset"></div></details>
+      </div>
+
+      <h3>Drie stapels: leren, kiezen, toetsen</h3>
+      <div class="cards three">
+        <div class="card"><p class="card-num" data-fill="n-train">1.768</p><p><strong>Train</strong>: hiervan leert het model. Elke ronde ziet het elke foto een keer, telkens een beetje anders (gedraaid, gespiegeld, lichter of donkerder), zodat het niet de foto zelf onthoudt.</p></div>
+        <div class="card"><p class="card-num" data-fill="n-val">379</p><p><strong>Validatie</strong>: hiermee kozen we instellingen, zoals hoe lang het model traint. Het model leert er niet van.</p></div>
+        <div class="card"><p class="card-num" data-fill="n-test">380</p><p><strong>Test</strong>: de eindtoets. Pas helemaal aan het eind gebruikt, één keer per model. Alle scores op deze pagina komen hieruit.</p></div>
+      </div>
+
+      <h3>Twee modellen</h3>
+      <div class="cards two">
+        <div class="card model-card" style="--model: var(--series-1)"><p class="model-name"><span class="swatch"></span>Eigen CNN</p><p>Zelf ontworpen en <strong>vanaf nul</strong> getraind, alleen op de trainingsfoto's. Begint als een leeg netwerk. Dit is het model waar dit project om draait.</p></div>
+        <div class="card model-card" style="--model: var(--series-2)"><p class="model-name"><span class="swatch"></span>MobileNet</p><p>Een bestaand model dat eerst op <strong>1,2 miljoen</strong> andere foto's (ImageNet) is getraind en daarna kort op dezelfde trainingsfoto's. Staat hier ter <strong>vergelijking</strong>: wat levert voorkennis op?</p></div>
+      </div>
+
+      <h3>Zo leerde het model</h3>
+      <p>Een <em>epoch</em> is één ronde door alle trainingsfoto's. Na elke ronde meten we hoe vaak het model goed zit, op de trainingsfoto's en op de validatiefoto's. Bewaard wordt de ronde met de beste validatiescore.</p>
+      <div class="chart-block">
+        <div class="controls" role="group" aria-label="Kies model en maat">
+          <div class="seg" id="curve-model"></div>
+          <div class="seg" id="curve-metric"></div>
+        </div>
+        <div class="legend" id="curve-legend"></div>
+        <div id="chart-curves" class="chart"></div>
+        <p id="curve-caption" class="muted small"></p>
+        <details class="table-view"><summary>Toon als tabel</summary><div id="table-curves"></div></details>
+      </div>
+
+      <h3>De eindtoets</h3>
+      <div id="stat-tiles" class="cards two"></div>
+      <div class="chart-block">
+        <h4>Waar gaat het mis? <span class="muted">(aantal testfoto's)</span></h4>
+        <div class="controls"><div class="seg" id="cm-model"></div></div>
+        <div id="chart-confusion" class="confusion"></div>
+        <p class="muted small">Elke rij is wat de foto echt is, elke kolom wat het model zei. De diagonaal is goed; alles daarbuiten is fout. Hoe donkerder, hoe groter het deel van die rij.</p>
+      </div>
+      <div class="chart-block">
+        <h4>Per soort</h4>
+        <div id="table-classes"></div>
+        <p class="muted small"><strong>Precisie</strong>: als het model "glas" zegt, hoe vaak klopt dat? <strong>Recall</strong>: van alle echte glazen voorwerpen, hoeveel herkent het? <strong>F1</strong> combineert die twee.</p>
+      </div>
+    </section>
+
+    <!-- 3 PROBEER -->
+    <section id="probeer">
+      <h2><span class="num">3</span> Probeer: welke bak?</h2>
+      <p>Kies een testfoto of upload er zelf een. Beide modellen beoordelen hem. <strong>Je foto blijft op je eigen apparaat</strong>: alles wordt in je browser berekend en er wordt niets verstuurd.</p>
+      <div class="picker" id="picker">
+        <div>
+          <h4>Voorbeelden uit de testset</h4>
+          <div class="thumbs" id="thumbs-normal"></div>
+        </div>
+        <div>
+          <h4>Lastige gevallen</h4>
+          <div class="thumbs" id="thumbs-hard"></div>
+        </div>
+        <div class="upload" id="dropzone">
+          <label class="button" for="upload">Upload een foto</label>
+          <input type="file" id="upload" accept="image/*" hidden>
+          <span class="muted small">of sleep een foto hierheen</span>
+          <p id="upload-error" class="error" role="alert" hidden></p>
+        </div>
+      </div>
+      <div class="result">
+        <figure class="photo">
+          <canvas id="try-image" aria-label="Gekozen foto"></canvas>
+          <figcaption id="try-caption"></figcaption>
+        </figure>
+        <div class="predictions" id="try-predictions"></div>
+      </div>
+    </section>
+
+    <!-- 4 TEST -->
+    <section id="test">
+      <h2><span class="num">4</span> Test: verander de foto</h2>
+      <p>Echte foto's van afval lijken niet op foto's op wit papier. Verander hieronder licht, hoek, scherpte en achtergrond van de gekozen foto en kijk wat de modellen ervan vinden. Elke stand wordt opnieuw door de echte modellen beoordeeld.</p>
+      <div class="test-grid">
+        <div>
+          <div class="sliders" id="sliders"></div>
+          <button type="button" class="button ghost" id="reset">Terug naar origineel</button>
+          <figure class="photo">
+            <canvas id="test-image" aria-label="Aangepaste foto"></canvas>
+          </figure>
+        </div>
+        <div class="predictions" id="test-predictions"></div>
+      </div>
+
+      <h3>Gemeten op alle <span data-fill="n-test">380</span> testfoto's</h3>
+      <p>Dezelfde aanpassingen, één tegelijk, op de hele testset. Dit zijn gemeten scores, geen schatting.</p>
+      <div class="chart-block">
+        <div class="legend" id="var-legend"></div>
+        <div id="chart-variations" class="multiples"></div>
+        <ul id="var-takeaways" class="takeaways"></ul>
+        <details class="table-view"><summary>Toon als tabel</summary><div id="table-variations"></div></details>
+      </div>
+    </section>
+
+    <!-- 5 REFLECTEER -->
+    <section id="reflecteer">
+      <h2><span class="num">5</span> Reflecteer: wat betekent dit?</h2>
+
+      <div class="reflect">
+        <h3>Zeker is niet hetzelfde als juist</h3>
+        <p id="reflect-confidence"></p>
+        <div class="mistakes" id="mistakes"></div>
+      </div>
+
+      <div class="reflect">
+        <h3>Het model kent alleen wat het gezien heeft</h3>
+        <p>Alle trainingsfoto's hebben dezelfde witte achtergrond, één voorwerp, schoon en goed belicht. Afval in een keuken of container ziet er anders uit: vies, verfrommeld, op een rommelige ondergrond. Het experiment hierboven laat zien hoe snel de scores dan dalen. De testscore van <span data-fill="acc-cnn"></span> geldt dus alleen voor foto's zoals in TrashNet.</p>
+        <p>Ook binnen de data is het scheef: restafval heeft maar <span data-fill="n-trash">137</span> foto's, papier en karton <span data-fill="n-paper">997</span>. Het model zag dus veel minder voorbeelden van restafval, en scoort daar ook het slechtst. Bij het trainen telden restafval-fouten daarom zwaarder mee, maar meer data is daar geen vervanging voor.</p>
+        <p>Een paar testfoto's bleken bijna dezelfde opname te zijn als een trainingsfoto (minstens 2 van de 380). Dan lijkt de toets makkelijker dan hij is.</p>
+      </div>
+
+      <div class="reflect">
+        <h3>Vijf materialen zijn geen vijf bakken</h3>
+        <p>Het model kent materialen, geen regels. In veel Nederlandse gemeenten gaan plastic, metaal en drinkpakken samen in één PMD-bak, in andere wordt plastic achteraf uit het restafval gehaald. Een gebruikte tissue hoort bij het restafval, ook al is het papier: MobileNet zei bij de tissue hierboven "papier en karton". Welke bak goed is, hangt af van regels die het model niet kent.</p>
+      </div>
+
+      <div class="reflect">
+        <h3>Waarom een mens moet blijven kijken</h3>
+        <p>Een verkeerde voorspelling ziet er precies zo uit als een goede: een label met een hoog percentage. Gebruik de uitkomst daarom als hint, niet als besluit. Liggen de scores van twee soorten dicht bij elkaar, of gaat het om iets wat je niet zeker weet, zoals batterijen, elektronica of verf? Kijk dan in de afvalwijzer van je gemeente. Dat soort chemisch en klein elektrisch afval kent dit model niet eens: het kiest altijd één van de vijf.</p>
+      </div>
+
+      <div class="reflect">
+        <h3>Privacy</h3>
+        <p>Geüploade foto's verlaten je apparaat niet. De modellen worden één keer gedownload en draaien daarna in je browser. Er is geen server die foto's ontvangt of opslaat.</p>
+      </div>
+
+      <div class="reflect">
+        <h3>Wat kost het?</h3>
+        <p id="reflect-cost"></p>
+      </div>
+
+      <div class="reflect">
+        <h3>Controle: rekent de browser hetzelfde als Python?</h3>
+        <p id="parity" data-state="pending">Wordt gecontroleerd zodra de modellen geladen zijn…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p><strong>Bronnen.</strong> Foto's: <a href="https://github.com/garythung/trashnet">TrashNet</a>, Gary Thung &amp; Mindy Yang (2017), code onder MIT-licentie. Vergelijkingsmodel: MobileNetV3-Small met ImageNet-gewichten uit torchvision. Uitvoeren in de browser: ONNX Runtime Web.</p>
+    <p><strong>Code en verantwoording.</strong> <a href="../">Projectpagina</a> · <a href="../DECISIONS/">Keuzes</a> · <a href="../results/">Resultaten</a> · scripts in <code>docs/Anh/waste-classifier/src/</code></p>
+  </footer>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+</body>
+</html>
