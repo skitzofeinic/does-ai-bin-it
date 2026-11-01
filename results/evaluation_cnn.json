@@ -1,0 +1,561 @@
+{
+ "model": "cnn",
+ "classes": [
+  "papier en karton",
+  "glas",
+  "plastic",
+  "metaal",
+  "restafval"
+ ],
+ "n_test": 380,
+ "accuracy": 0.7947,
+ "balanced_accuracy": 0.7782,
+ "per_class": [
+  {
+   "class": "papier en karton",
+   "precision": 0.9191,
+   "recall": 0.8389,
+   "f1": 0.8772,
+   "support": 149
+  },
+  {
+   "class": "glas",
+   "precision": 0.6813,
+   "recall": 0.8158,
+   "f1": 0.7425,
+   "support": 76
+  },
+  {
+   "class": "plastic",
+   "precision": 0.8254,
+   "recall": 0.7123,
+   "f1": 0.7647,
+   "support": 73
+  },
+  {
+   "class": "metaal",
+   "precision": 0.7619,
+   "recall": 0.7742,
+   "f1": 0.768,
+   "support": 62
+  },
+  {
+   "class": "restafval",
+   "precision": 0.5556,
+   "recall": 0.75,
+   "f1": 0.6383,
+   "support": 20
+  }
+ ],
+ "confusion_matrix": [
+  [
+   125,
+   6,
+   4,
+   8,
+   6
+  ],
+  [
+   4,
+   62,
+   5,
+   5,
+   0
+  ],
+  [
+   4,
+   12,
+   52,
+   1,
+   4
+  ],
+  [
+   3,
+   7,
+   2,
+   48,
+   2
+  ],
+  [
+   0,
+   4,
+   0,
+   1,
+   15
+  ]
+ ],
+ "mean_confidence_correct": 0.8778,
+ "mean_confidence_wrong": 0.5948,
+ "confident_mistakes": 13,
+ "confident_threshold": 0.8,
+ "mistakes": [
+  {
+   "file": "paper/paper93.jpg",
+   "true": "papier en karton",
+   "predicted": "restafval",
+   "confidence": 0.9667
+  },
+  {
+   "file": "plastic/plastic97.jpg",
+   "true": "plastic",
+   "predicted": "papier en karton",
+   "confidence": 0.9471
+  },
+  {
+   "file": "paper/paper216.jpg",
+   "true": "papier en karton",
+   "predicted": "restafval",
+   "confidence": 0.943
+  },
+  {
+   "file": "glass/glass21.jpg",
+   "true": "glas",
+   "predicted": "metaal",
+   "confidence": 0.9413
+  },
+  {
+   "file": "plastic/plastic36.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.9058
+  },
+  {
+   "file": "metal/metal87.jpg",
+   "true": "metaal",
+   "predicted": "papier en karton",
+   "confidence": 0.8761
+  },
+  {
+   "file": "cardboard/cardboard117.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.8577
+  },
+  {
+   "file": "cardboard/cardboard143.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.8549
+  },
+  {
+   "file": "plastic/plastic204.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.8359
+  },
+  {
+   "file": "paper/paper570.jpg",
+   "true": "papier en karton",
+   "predicted": "restafval",
+   "confidence": 0.8348
+  },
+  {
+   "file": "glass/glass385.jpg",
+   "true": "glas",
+   "predicted": "metaal",
+   "confidence": 0.8309
+  },
+  {
+   "file": "glass/glass269.jpg",
+   "true": "glas",
+   "predicted": "plastic",
+   "confidence": 0.8229
+  },
+  {
+   "file": "paper/paper427.jpg",
+   "true": "papier en karton",
+   "predicted": "plastic",
+   "confidence": 0.815
+  },
+  {
+   "file": "plastic/plastic368.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.7805
+  },
+  {
+   "file": "plastic/plastic455.jpg",
+   "true": "plastic",
+   "predicted": "papier en karton",
+   "confidence": 0.7732
+  },
+  {
+   "file": "plastic/plastic259.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.7384
+  },
+  {
+   "file": "metal/metal402.jpg",
+   "true": "metaal",
+   "predicted": "plastic",
+   "confidence": 0.7337
+  },
+  {
+   "file": "glass/glass340.jpg",
+   "true": "glas",
+   "predicted": "metaal",
+   "confidence": 0.7335
+  },
+  {
+   "file": "cardboard/cardboard111.jpg",
+   "true": "papier en karton",
+   "predicted": "plastic",
+   "confidence": 0.7244
+  },
+  {
+   "file": "metal/metal259.jpg",
+   "true": "metaal",
+   "predicted": "papier en karton",
+   "confidence": 0.7107
+  },
+  {
+   "file": "cardboard/cardboard171.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.7069
+  },
+  {
+   "file": "metal/metal331.jpg",
+   "true": "metaal",
+   "predicted": "papier en karton",
+   "confidence": 0.7008
+  },
+  {
+   "file": "plastic/plastic456.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.6992
+  },
+  {
+   "file": "paper/paper95.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.6809
+  },
+  {
+   "file": "paper/paper272.jpg",
+   "true": "papier en karton",
+   "predicted": "restafval",
+   "confidence": 0.6778
+  },
+  {
+   "file": "cardboard/cardboard245.jpg",
+   "true": "papier en karton",
+   "predicted": "restafval",
+   "confidence": 0.6764
+  },
+  {
+   "file": "paper/paper394.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.6636
+  },
+  {
+   "file": "plastic/plastic86.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.6611
+  },
+  {
+   "file": "paper/paper406.jpg",
+   "true": "papier en karton",
+   "predicted": "plastic",
+   "confidence": 0.6573
+  },
+  {
+   "file": "plastic/plastic199.jpg",
+   "true": "plastic",
+   "predicted": "papier en karton",
+   "confidence": 0.6568
+  },
+  {
+   "file": "metal/metal93.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.6564
+  },
+  {
+   "file": "paper/paper535.jpg",
+   "true": "papier en karton",
+   "predicted": "restafval",
+   "confidence": 0.6531
+  },
+  {
+   "file": "glass/glass265.jpg",
+   "true": "glas",
+   "predicted": "papier en karton",
+   "confidence": 0.6366
+  },
+  {
+   "file": "metal/metal297.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.6362
+  },
+  {
+   "file": "paper/paper508.jpg",
+   "true": "papier en karton",
+   "predicted": "plastic",
+   "confidence": 0.616
+  },
+  {
+   "file": "glass/glass184.jpg",
+   "true": "glas",
+   "predicted": "metaal",
+   "confidence": 0.6157
+  },
+  {
+   "file": "glass/glass27.jpg",
+   "true": "glas",
+   "predicted": "metaal",
+   "confidence": 0.6085
+  },
+  {
+   "file": "metal/metal3.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.5857
+  },
+  {
+   "file": "trash/trash67.jpg",
+   "true": "restafval",
+   "predicted": "glas",
+   "confidence": 0.5732
+  },
+  {
+   "file": "cardboard/cardboard154.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.5685
+  },
+  {
+   "file": "paper/paper370.jpg",
+   "true": "papier en karton",
+   "predicted": "glas",
+   "confidence": 0.5605
+  },
+  {
+   "file": "trash/trash62.jpg",
+   "true": "restafval",
+   "predicted": "glas",
+   "confidence": 0.5583
+  },
+  {
+   "file": "metal/metal152.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.5538
+  },
+  {
+   "file": "plastic/plastic109.jpg",
+   "true": "plastic",
+   "predicted": "papier en karton",
+   "confidence": 0.5481
+  },
+  {
+   "file": "plastic/plastic256.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.5461
+  },
+  {
+   "file": "trash/trash31.jpg",
+   "true": "restafval",
+   "predicted": "glas",
+   "confidence": 0.541
+  },
+  {
+   "file": "glass/glass166.jpg",
+   "true": "glas",
+   "predicted": "plastic",
+   "confidence": 0.5272
+  },
+  {
+   "file": "glass/glass275.jpg",
+   "true": "glas",
+   "predicted": "papier en karton",
+   "confidence": 0.5221
+  },
+  {
+   "file": "cardboard/cardboard302.jpg",
+   "true": "papier en karton",
+   "predicted": "glas",
+   "confidence": 0.5149
+  },
+  {
+   "file": "metal/metal358.jpg",
+   "true": "metaal",
+   "predicted": "plastic",
+   "confidence": 0.514
+  },
+  {
+   "file": "plastic/plastic363.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.5127
+  },
+  {
+   "file": "metal/metal362.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.4922
+  },
+  {
+   "file": "trash/trash40.jpg",
+   "true": "restafval",
+   "predicted": "metaal",
+   "confidence": 0.4898
+  },
+  {
+   "file": "glass/glass6.jpg",
+   "true": "glas",
+   "predicted": "papier en karton",
+   "confidence": 0.482
+  },
+  {
+   "file": "plastic/plastic371.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.4797
+  },
+  {
+   "file": "metal/metal179.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.4754
+  },
+  {
+   "file": "paper/paper113.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.4677
+  },
+  {
+   "file": "glass/glass304.jpg",
+   "true": "glas",
+   "predicted": "papier en karton",
+   "confidence": 0.4646
+  },
+  {
+   "file": "trash/trash117.jpg",
+   "true": "restafval",
+   "predicted": "glas",
+   "confidence": 0.4533
+  },
+  {
+   "file": "metal/metal166.jpg",
+   "true": "metaal",
+   "predicted": "glas",
+   "confidence": 0.4498
+  },
+  {
+   "file": "glass/glass400.jpg",
+   "true": "glas",
+   "predicted": "plastic",
+   "confidence": 0.4474
+  },
+  {
+   "file": "metal/metal9.jpg",
+   "true": "metaal",
+   "predicted": "restafval",
+   "confidence": 0.4384
+  },
+  {
+   "file": "cardboard/cardboard392.jpg",
+   "true": "papier en karton",
+   "predicted": "glas",
+   "confidence": 0.3994
+  },
+  {
+   "file": "plastic/plastic264.jpg",
+   "true": "plastic",
+   "predicted": "restafval",
+   "confidence": 0.3984
+  },
+  {
+   "file": "cardboard/cardboard128.jpg",
+   "true": "papier en karton",
+   "predicted": "metaal",
+   "confidence": 0.398
+  },
+  {
+   "file": "paper/paper243.jpg",
+   "true": "papier en karton",
+   "predicted": "glas",
+   "confidence": 0.398
+  },
+  {
+   "file": "glass/glass214.jpg",
+   "true": "glas",
+   "predicted": "plastic",
+   "confidence": 0.3953
+  },
+  {
+   "file": "plastic/plastic454.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.3935
+  },
+  {
+   "file": "plastic/plastic9.jpg",
+   "true": "plastic",
+   "predicted": "restafval",
+   "confidence": 0.3843
+  },
+  {
+   "file": "plastic/plastic167.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.3761
+  },
+  {
+   "file": "paper/paper530.jpg",
+   "true": "papier en karton",
+   "predicted": "glas",
+   "confidence": 0.3563
+  },
+  {
+   "file": "paper/paper592.jpg",
+   "true": "papier en karton",
+   "predicted": "glas",
+   "confidence": 0.3482
+  },
+  {
+   "file": "metal/metal160.jpg",
+   "true": "metaal",
+   "predicted": "restafval",
+   "confidence": 0.345
+  },
+  {
+   "file": "plastic/plastic480.jpg",
+   "true": "plastic",
+   "predicted": "restafval",
+   "confidence": 0.3429
+  },
+  {
+   "file": "glass/glass263.jpg",
+   "true": "glas",
+   "predicted": "plastic",
+   "confidence": 0.3403
+  },
+  {
+   "file": "plastic/plastic359.jpg",
+   "true": "plastic",
+   "predicted": "metaal",
+   "confidence": 0.3398
+  },
+  {
+   "file": "plastic/plastic10.jpg",
+   "true": "plastic",
+   "predicted": "glas",
+   "confidence": 0.313
+  },
+  {
+   "file": "plastic/plastic4.jpg",
+   "true": "plastic",
+   "predicted": "restafval",
+   "confidence": 0.273
+  }
+ ]
+}

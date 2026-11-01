@@ -1,0 +1,98 @@
+{
+ "method": "dHash 8x8, zelfde map",
+ "max_distance": 4,
+ "n_test": 380,
+ "n_flagged": 18,
+ "pairs": [
+  {
+   "test": "cardboard/cardboard10.jpg",
+   "train": "cardboard/cardboard2.jpg",
+   "distance": 4
+  },
+  {
+   "test": "cardboard/cardboard110.jpg",
+   "train": "cardboard/cardboard221.jpg",
+   "distance": 4
+  },
+  {
+   "test": "cardboard/cardboard249.jpg",
+   "train": "cardboard/cardboard83.jpg",
+   "distance": 4
+  },
+  {
+   "test": "cardboard/cardboard34.jpg",
+   "train": "cardboard/cardboard351.jpg",
+   "distance": 4
+  },
+  {
+   "test": "glass/glass183.jpg",
+   "train": "glass/glass147.jpg",
+   "distance": 3
+  },
+  {
+   "test": "glass/glass5.jpg",
+   "train": "glass/glass15.jpg",
+   "distance": 3
+  },
+  {
+   "test": "paper/paper110.jpg",
+   "train": "paper/paper50.jpg",
+   "distance": 0
+  },
+  {
+   "test": "paper/paper241.jpg",
+   "train": "paper/paper239.jpg",
+   "distance": 3
+  },
+  {
+   "test": "paper/paper345.jpg",
+   "train": "paper/paper451.jpg",
+   "distance": 1
+  },
+  {
+   "test": "paper/paper378.jpg",
+   "train": "paper/paper117.jpg",
+   "distance": 4
+  },
+  {
+   "test": "paper/paper406.jpg",
+   "train": "paper/paper322.jpg",
+   "distance": 4
+  },
+  {
+   "test": "paper/paper427.jpg",
+   "train": "paper/paper493.jpg",
+   "distance": 3
+  },
+  {
+   "test": "paper/paper498.jpg",
+   "train": "paper/paper50.jpg",
+   "distance": 3
+  },
+  {
+   "test": "plastic/plastic102.jpg",
+   "train": "plastic/plastic348.jpg",
+   "distance": 4
+  },
+  {
+   "test": "plastic/plastic256.jpg",
+   "train": "plastic/plastic180.jpg",
+   "distance": 4
+  },
+  {
+   "test": "plastic/plastic385.jpg",
+   "train": "plastic/plastic35.jpg",
+   "distance": 4
+  },
+  {
+   "test": "plastic/plastic9.jpg",
+   "train": "plastic/plastic11.jpg",
+   "distance": 4
+  },
+  {
+   "test": "plastic/plastic90.jpg",
+   "train": "plastic/plastic43.jpg",
+   "distance": 2
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+[
+ {
+  "model": "cnn",
+  "onnx_bytes": 1593379,
+  "n_test": 380,
+  "max_abs_diff": 8.344650268554688e-07,
+  "same_prediction": 380
+ },
+ {
+  "model": "mobilenet",
+  "onnx_bytes": 6440139,
+  "n_test": 380,
+  "max_abs_diff": 7.62939453125e-06,
+  "same_prediction": 380
+ }
+]
