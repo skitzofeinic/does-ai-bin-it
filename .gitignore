@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+
+# PyTorch-checkpoints; de browser gebruikt de ONNX-export
+model/*.pt
+
+# De dataset staat buiten de repository (zie DECISIONS.md); dit vangt een per ongeluk lokale kopie af
+data/
