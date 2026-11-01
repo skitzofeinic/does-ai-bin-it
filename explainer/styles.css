@@ -1,28 +1,30 @@
-/* Welke bak? Ontwerp: een IDE in het palet van coolors.co/2b2d42-8d99ae-edf2f4-ef233c-d90429.
-   IJswit papier, donkerblauwe inkt en tabbalk, koel grijs voor commentaar, rood als enige accent.
-   Alles in JetBrains Mono; titels als Markdown-koppen (# ...), sectielabels als commentaar (// ...).
-   Geen afrondingen, 1px-lijnen. Kleur buiten het palet alleen als die een functie heeft:
-   bakkleuren (welke bak) en groen (goed, actief, geladen); rood betekent ook fout.
-   Bakken: blauw, groen, geel, en voor metaal en restafval staalgrijs en donkerblauw uit het palet,
-   zodat rood vrij blijft voor accent en fout. Gevalideerd (dataviz-validator, alle paren, op --bg):
-   kleurenblind-scheiding ΔE 14,3 en normaal zicht 16,6 geslaagd; de twee grijzen zijn bewust grijs
-   en elke bak draagt altijd zijn naam.
+/* Welke bak? Ontwerp: een donkere IDE in het palet van coolors.co/2b2d42-8d99ae-edf2f4-ef233c-d90429.
+   Donkerblauw scherm, lichte tekst, koel grijs voor commentaar, rood als enige accent.
+   Tekst in JetBrains Mono, titels in IBM Plex Mono Bold, h1 in hoofdletters. Geen afrondingen, 1px-lijnen.
+   Animaties zonder easing: alles springt in stappen (steps()).
+   Kleur buiten het palet alleen als die een functie heeft: bakkleuren (welke bak), groen (goed,
+   actief, geladen), rood (fout) en rood/groen/blauw voor de kleurkanalen van een pixel.
+   Bakkleuren: de officiële afvalpictogrammen (afvalcirculair.nl). Metaal heeft daar geen eigen
+   kleur (blik gaat in PMD); het krijgt het PMD-geel, plastic het PMD-oranje. Gevalideerd
+   (dataviz-validator, alle paren, op --bg): kleurenblind-scheiding ΔE 14,8 en normaal zicht 16,5
+   geslaagd; de officiële kleuren zijn lichter/grijzer dan de validator voor donker wil, daarom
+   krijgt elke bak een lichte omtrek en altijd zijn naam.
    Modellen zonder kleur: eigen CNN = doorgetrokken en dicht, MobileNet = gestippeld en open. */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   --accent: #ef233c;      /* rood */
-  --accent-deep: #d90429; /* donkerrood: overtuigd fout */
+  --accent-deep: #ef233c; /* overtuigd fout */
 
-  --bin-0: #2a78d6;  /* papier en karton */
-  --bin-1: #008300;  /* glas */
-  --bin-2: #eda100;  /* plastic */
-  --bin-3: #8d99ae;  /* metaal: staalgrijs */
-  --bin-4: #2b2d42;  /* restafval: donkerblauw */
+  --bin-0: #0070cd;  /* papier en karton */
+  --bin-1: #64ccc9;  /* glas */
+  --bin-2: #ff6b0b;  /* plastic (PMD oranje) */
+  --bin-3: #ffc627;  /* metaal (PMD geel) */
+  --bin-4: #646469;  /* restafval */
 
-  --good: #2e7d32;
-  --bad: #d90429;
+  --good: #5fd47a;
+  --bad: #ff4d5e;
 
-  --font-head: var(--font);
+  --font-head: 'IBM Plex Mono', 'JetBrains Mono', monospace;
   --font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --step-small: clamp(0.74rem, 0.72rem + 0.1vw, 0.82rem);
   --step-body: clamp(0.9rem, 0.86rem + 0.15vw, 0.98rem);
@@ -32,16 +34,16 @@
   --side: clamp(20px, 6vw, 104px);
   --chrome: 38px;  /* hoogte tabbalk */
   --pad: clamp(3.5rem, 7vw, 7rem);
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease: steps(4, end);  /* schokkerig: geen easing */
 
-  --bg: #edf2f4;       /* ijswit */
-  --bg-2: #dfe5e9;     /* panelen */
-  --ink: #2b2d42;      /* donkerblauw: koppen en nadruk */
-  --ink-2: #4a4e66;    /* lopende tekst */
-  --muted: #6f7a8f;    /* commentaar (iets donkerder dan #8d99ae, voor leesbaarheid) */
-  --line: rgba(43, 45, 66, 0.45);
-  --hair: rgba(43, 45, 66, 0.14);
-  --panel: rgba(255, 255, 255, 0.55);
+  --bg: #2b2d42;       /* donkerblauw scherm */
+  --bg-2: #222436;     /* balken */
+  --ink: #edf2f4;      /* koppen en nadruk */
+  --ink-2: #c3cad6;    /* lopende tekst */
+  --muted: #8d99ae;    /* commentaar */
+  --line: rgba(237, 242, 244, 0.38);
+  --hair: rgba(237, 242, 244, 0.12);
+  --panel: rgba(255, 255, 255, 0.04);
 }
 
 *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
@@ -64,16 +66,14 @@ button { font: inherit; color: inherit; }
 .field { color: var(--ink-2); }
 
 .giant, .head, .footer-mark {
-  font-family: var(--font-head); font-weight: 800; color: var(--ink);
-  letter-spacing: -0.045em; line-height: 1.02;
+  font-family: var(--font-head); font-weight: 700; color: var(--ink);
+  letter-spacing: -0.03em; line-height: 1;
 }
-/* titels als Markdown-koppen */
-.giant::before, .head::before { content: '# '; color: var(--muted); font-weight: 400; letter-spacing: -0.06em; }
 /* grote cijfers en woorden: teksteditor-letter, vet */
 .wordmark, .game-q, .exam-num, .fill-num, .score b, .rai-big, .verdict-label {
   font-family: var(--font); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: var(--ink);
 }
-.giant { font-size: var(--step-giant); }
+.giant { font-size: var(--step-giant); text-transform: uppercase; }
 .head { font-size: var(--step-head); text-wrap: balance; }
 h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.04em; }
 .lead { font-size: var(--step-lead); line-height: 1.5; max-width: 40ch; color: var(--ink); }
@@ -93,7 +93,7 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
   background: var(--ink); color: var(--bg); border: 1px solid var(--ink);
   font-family: var(--font); font-weight: 700; font-size: var(--step-small); text-transform: uppercase; letter-spacing: 0.06em;
   text-decoration: none; cursor: pointer; white-space: nowrap;
-  transition: background-color 120ms ease, color 120ms ease, transform 120ms var(--ease);
+  transition: none;
 }
 .button::before { content: '>'; }
 .button:active { transform: translate(1px, 1px); }
@@ -112,7 +112,7 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
 /* ---------- IDE: tabbalk, regelnummers, statusbalk ---------- */
 .ide-top {
   position: sticky; top: 0; z-index: 30; height: var(--chrome);
-  display: flex; align-items: stretch; background: var(--ink); color: #edf2f4; border-bottom: 1px solid var(--ink);
+  display: flex; align-items: stretch; background: var(--bg-2); color: #edf2f4; border-bottom: 1px solid var(--hair);
 }
 .ide-title { display: flex; align-items: center; padding: 0 16px; font-size: var(--step-small); font-weight: 700; white-space: nowrap; border-right: 1px solid rgba(237, 242, 244, 0.15); }
 .ide-title .dim { color: #8d99ae; font-weight: 400; }
@@ -129,7 +129,7 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
 .tabs a[aria-current="page"]::before { background: var(--accent); }
 
 .hdr-status {
-  display: flex; flex: none; align-items: center; gap: 6px; padding: 0 16px; border-left: 1px solid rgba(237, 242, 244, 0.15); background: var(--ink);
+  display: flex; flex: none; align-items: center; gap: 6px; padding: 0 16px; border-left: 1px solid rgba(237, 242, 244, 0.15); background: var(--bg-2);
   font-size: var(--step-small); white-space: nowrap; color: #edf2f4;
 }
 .hdr-status::before { content: '○'; color: #8d99ae; }
@@ -164,7 +164,7 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
 button.bin { cursor: pointer; }
 .bin-lid {
   position: relative; width: 100%; height: 12px; margin-top: 7px; background: var(--c); filter: brightness(0.84);
-  border: 1.5px solid var(--ink); transition: transform 300ms var(--ease); transform-origin: 4% 100%;
+  border: 1.5px solid var(--ink); transition: transform 240ms steps(3, end); transform-origin: 4% 100%;
 }
 .bin-lid::before { /* handvat */
   content: ''; position: absolute; left: 50%; bottom: 100%; width: 28%; height: 7px; transform: translateX(-50%);
@@ -177,7 +177,7 @@ button.bin { cursor: pointer; }
   display: grid; place-items: center; padding: 6px 7%;
 }
 .bin-body::before, .bin-body::after { /* wieltjes */
-  content: ''; position: absolute; bottom: -7px; width: 13%; height: 7px; background: var(--ink);
+  content: ''; position: absolute; bottom: -7px; width: 13%; height: 7px; background: #0e0f18; border: 1.5px solid var(--ink);
 }
 .bin-body::before { left: 9%; }
 .bin-body::after { right: 9%; }
@@ -195,7 +195,7 @@ button.bin:disabled { cursor: default; }
 .chip {
   display: inline-flex; align-items: center; gap: 5px; padding: 2px 7px; border: 1px solid var(--ink);
   font-size: 0.72rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums;
-  animation: drop 380ms var(--ease) both;
+  animation: drop 360ms steps(3, end) both;
 }
 .chip.cnn { background: var(--ink); color: var(--bg); }
 .chip.mobilenet { background: var(--bg); color: var(--ink); border-style: dashed; }
@@ -204,20 +204,7 @@ button.bin:disabled { cursor: default; }
 .chip.mobilenet i { background: none; border: 1.5px solid currentColor; border-radius: 50%; }
 @keyframes drop { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
 
-/* vallende foto's in de hero */
-.hero-bins .bin { position: relative; }
-.faller {
-  position: absolute; width: 62%; aspect-ratio: 4 / 3; object-fit: cover; top: 0; left: 19%;
-  border: 1.5px solid var(--ink); opacity: 0;
-  animation: fall 1.4s var(--ease) forwards; animation-delay: var(--d);
-}
-@keyframes fall {
-  0% { opacity: 0; transform: translateY(-60vh) rotate(var(--r)); }
-  15% { opacity: 1; }
-  70% { transform: translateY(-10px) rotate(calc(var(--r) * -0.3)); opacity: 1; }
-  100% { transform: translateY(38px) rotate(0deg) scale(0.6); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) { .faller { display: none; } .chip { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .chip { animation: none; } }
 
 /* ---------- hoofdstukken ---------- */
 .chapter { position: relative; z-index: 1; padding: var(--pad) 0; border-top: 1px solid var(--line); }
@@ -269,7 +256,7 @@ button.bin:disabled { cursor: default; }
 
 /* machine */
 .strip { display: flex; gap: 4px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 1.5rem; }
-.strip button { flex: 0 0 auto; width: 64px; border: 1px solid var(--hair); padding: 2px; background: none; cursor: pointer; opacity: 0.6; transition: opacity 120ms; }
+.strip button { flex: 0 0 auto; width: 64px; border: 1px solid var(--hair); padding: 2px; background: none; cursor: pointer; opacity: 0.6; }
 .strip button img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .strip button[aria-pressed="true"] { opacity: 1; border: 2px solid var(--ink); }
 .strip button:hover { opacity: 1; }
@@ -292,7 +279,7 @@ button.bin:disabled { cursor: default; }
 .pixel-marker { position: absolute; outline: 2px solid var(--accent); outline-offset: 1px; pointer-events: none; }
 .pixel-readout { display: grid; gap: 14px; align-content: start; }
 .channels { display: grid; gap: 6px; }
-.ch { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) 3.2em 5.5em; gap: 10px; align-items: center; font-size: var(--step-small); }
+.ch { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) 3.2em 7em; gap: 10px; align-items: center; font-size: var(--step-small); }
 .ch-head { color: var(--muted); font-size: 0.7rem; white-space: nowrap; }
 .ch-head span:last-child, .ch-model, .ch b { text-align: right; }
 .ch-name { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--ink); }
@@ -334,7 +321,7 @@ button.bin:disabled { cursor: default; }
 .vbar-top { display: flex; justify-content: space-between; color: var(--ink-2); }
 .vbar.win .vbar-top { color: var(--ink); font-weight: 700; }
 .vbar-track { height: 9px; border: 1px solid var(--hair); }
-.vbar-fill { height: 100%; background: var(--c); transition: width 400ms var(--ease); }
+.vbar-fill { height: 100%; background: var(--c); transition: width 400ms steps(5, end); }
 
 /* data */
 .bin-fill { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(8px, 2vw, 24px); align-items: end; }
@@ -446,8 +433,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
   padding: clamp(18px, 2.4vw, 28px); display: flex; flex-direction: column; gap: 12px; min-height: 280px;
 }
 .rai-tile.dark {
-  --bg: var(--ink); --ink: #ffffff; --ink-2: #c9d0dc; --hair: rgba(255, 255, 255, 0.28);
-  background: #2b2d42; color: #fff;
+  --ink: #ffffff; --ink-2: #c9d0dc; --hair: rgba(255, 255, 255, 0.2);
+  background: #1b1d2c; color: #fff;
 }
 .rai-kicker { display: flex; align-items: center; gap: 8px; font-size: var(--step-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
 .rai-kicker span::before { content: '['; }
@@ -497,8 +484,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 
 .tooltip {
   position: fixed; z-index: 50; pointer-events: none; max-width: 280px;
-  background: #141414; color: #f0f0f0; font: 0.74rem / 1.45 var(--font);
-  padding: 6px 9px; border: 1px solid #f0f0f0;
+  background: #11121b; color: #edf2f4; font: 0.74rem / 1.45 var(--font);
+  padding: 6px 9px; border: 1px solid var(--line);
 }
 
 @media (max-width: 860px) {

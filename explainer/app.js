@@ -255,16 +255,7 @@ async function exampleProbs(ex) {
 // ---------- hero ----------
 
 function renderHero() {
-  const holder = $('#hero-bins');
-  holder.innerHTML = bins();
-  const picks = state.data.classes.map((_, k) => state.data.examples.find((e) => !e.note && e.label === k));
-  holder.querySelectorAll('.bin').forEach((binEl, k) => {
-    if (!picks[k]) return;
-    const img = el('img', { class: 'faller', src: exampleUrl(picks[k]), alt: '' });
-    img.style.setProperty('--d', `${0.35 + k * 0.28}s`);
-    img.style.setProperty('--r', `${(k % 2 ? 1 : -1) * (6 + k * 3)}deg`);
-    binEl.prepend(img);
-  });
+  $('#hero-bins').innerHTML = bins();
 }
 
 // ---------- 1 spel ----------
@@ -597,9 +588,11 @@ function selectFilter(o) {
       <div class="kernel-grid">${Array.from({ length: K * K }, (_, j) => {
         const v = w(i, Math.floor(j / K), j % K);
         const a = (Math.abs(v) / maxAbs) * 0.85;
-        const bg = v >= 0 ? `rgba(43,45,66,${a.toFixed(2)})` : `rgba(141,153,174,${a.toFixed(2)})`;
-        const ink = v >= 0 && a > 0.45 ? '#fff' : 'var(--ink)';
-        return `<span style="background:${bg};color:${ink}">${v >= 0 ? '+' : '−'}${fmtNum(Math.abs(v), 2)}</span>`;
+        // + = licht vlak (hoe sterker, hoe lichter), − = gestippelde rand
+        const style = v >= 0
+          ? `background:rgba(237,242,244,${a.toFixed(2)});color:${a > 0.45 ? '#2b2d42' : 'var(--ink)'}`
+          : `border:1px dashed rgba(237,242,244,${(0.25 + a * 0.75).toFixed(2)});color:var(--ink-2)`;
+        return `<span style="${style}">${v >= 0 ? '+' : '−'}${fmtNum(Math.abs(v), 2)}</span>`;
       }).join('')}</div>
     </div>`).join('');
 
@@ -608,7 +601,7 @@ function selectFilter(o) {
     <p class="filter-title">Filter #${String(o + 1).padStart(2, '0')}</p>
     <canvas width="${size}" height="${size}" class="pixelated filter-big" aria-label="Kaart van filter ${o + 1}"></canvas>
     <p class="fine">Reageert op <b>${fmtPct(map.active)}</b> van de pixels van deze foto${map.active === 0 ? ': dit patroon zit er niet in' : ''}.</p>
-    <p class="fine">Het patroon: 3 × 3 gewichten per kleur. <b>+</b> donker = die kleur op die plek maakt het filter sterker, <b>−</b> grijs = zwakker.</p>
+    <p class="fine">Het patroon: 3 × 3 gewichten per kleur. <b>+</b> licht vlak = die kleur op die plek maakt het filter sterker, <b>−</b> gestippeld = zwakker.</p>
     <div class="kernels">${kernels}</div>`;
   detail.querySelector('canvas').getContext('2d').putImageData(map.img, 0, 0);
 }
