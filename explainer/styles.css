@@ -331,6 +331,28 @@ table.data thead th { color: var(--ink-2); font-weight: 600; }
 .hard-card .x { color: #ff8a80; font-weight: 700; }
 .hard-card .v { color: #7bd88f; font-weight: 700; }
 
+/* responsible AI */
+.rai { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.rai-tile {
+  background: var(--cream); border-radius: 18px; padding: clamp(18px, 2.4vw, 28px);
+  display: flex; flex-direction: column; gap: 12px; min-height: 280px;
+}
+.rai-tile.dark { background: var(--black); color: var(--on-black); }
+.rai-kicker { display: flex; align-items: center; gap: 8px; font-size: var(--step-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.rai-kicker span { display: inline-grid; place-items: center; width: 1.7em; height: 1.7em; border-radius: 50%; background: var(--bin-2); color: var(--ink); letter-spacing: 0; }
+.rai-big { font-size: clamp(2.1rem, 1.3rem + 2.4vw, 3.4rem); font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; }
+.rai-big.alert { color: var(--bad); font-size: clamp(3rem, 1.8rem + 4vw, 5.2rem); }
+.rai-text { font-size: var(--step-small); color: var(--ink-2); line-height: 1.45; }
+.rai-tile.dark .rai-text { color: var(--on-black-2); }
+.rai-link { margin-top: auto; font-weight: 700; font-size: var(--step-small); text-underline-offset: 0.2em; }
+.rai-link::after { content: ' ↑'; }
+.rai-bars { display: grid; gap: 8px; }
+.rai-bars-title { font-size: 0.75rem; color: var(--on-black-2); }
+.rai-bar { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 0.82rem; color: var(--on-black-2); }
+.rai-bar b { font-variant-numeric: tabular-nums; color: var(--on-black); }
+.rai-bar i { grid-column: 1 / -1; height: 10px; border-radius: 0 4px 4px 0; background: #5c5853; }
+.rai-bar.base i { background: var(--on-black); }
+
 /* vragen */
 .faq-wrap { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 32px; align-items: start; }
 .faq details { border-top: 2px solid var(--ink); padding: 14px 0; }
@@ -361,6 +383,7 @@ table.data thead th { color: var(--ink-2); font-weight: 600; }
   .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stage:nth-child(2)::after { display: none; }
   .stage-visual.verdict-visual { aspect-ratio: auto; min-height: 100%; padding: 12px 10px; }
+  .rai { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lab { grid-template-columns: 1fr 1fr; }
   .lab-verdicts { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
   .own { grid-template-columns: 1fr; }
@@ -370,6 +393,8 @@ table.data thead th { color: var(--ink-2); font-weight: 600; }
   .pill { margin-left: auto; }
   .hero-main { align-content: center; gap: 28px; }
   .lab, .lab-verdicts { grid-template-columns: 1fr; }
+  .rai { grid-template-columns: 1fr; }
+  .rai-tile { min-height: 0; }
   .squares { gap: 2px; }
   .chip { font-size: 0.64rem; padding: 2px 5px; white-space: normal; text-align: center; justify-content: center; line-height: 1.15; }
   .bin-body, .hero-bins .bin-body { font-size: 0.6rem; padding: 4px 3%; overflow-wrap: anywhere; hyphens: auto; }

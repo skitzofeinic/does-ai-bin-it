@@ -23,6 +23,7 @@
         <a href="#machine">Hoe het kijkt</a>
         <a href="#toets">Eindtoets</a>
         <a href="#lab">Breek het</a>
+        <a href="#rai">Responsible AI</a>
         <a href="#vragen">Vragen</a>
       </div>
       <span class="pill" id="status" data-state="loading" role="status">Laden…</span>
@@ -189,19 +190,59 @@
       </div>
     </section>
 
-    <!-- 7 VRAGEN -->
+    <!-- 7 RESPONSIBLE AI -->
+    <section class="chapter field-paper" id="rai" aria-labelledby="rai-title">
+      <div class="wrap">
+        <div class="chapter-head">
+          <h2 class="head" id="rai-title">Responsible AI</h2>
+          <p class="lead">Zes vragen om aan elk AI-systeem te stellen. Zo staat deze ervoor, gemeten.</p>
+        </div>
+        <div class="rai">
+          <article class="rai-tile dark">
+            <p class="rai-kicker"><span>1</span>Datakwaliteit en bias</p>
+            <div class="rai-bars" id="rai-bias-bars"></div>
+            <p class="rai-text" id="rai-bias"></p>
+            <a class="rai-link" href="#lab">Test het in het lab</a>
+          </article>
+          <article class="rai-tile">
+            <p class="rai-kicker"><span>2</span>Betrouwbaarheid</p>
+            <p class="rai-big alert" id="rai-trust-big"></p>
+            <p class="rai-text" id="rai-trust"></p>
+            <a class="rai-link" href="#zeker">Bekijk de overtuigde fouten</a>
+          </article>
+          <article class="rai-tile">
+            <p class="rai-kicker"><span>3</span>Transparantie</p>
+            <p class="rai-big">49.152 → 5</p>
+            <p class="rai-text">Je ziet wat erin gaat, wat de filters vinden en wat eruit komt. Waaróm het model kiest, blijft deels verborgen: filters tonen wat het zoekt, niet wat het begrijpt.</p>
+            <a class="rai-link" href="#machine">Kijk mee in het model</a>
+          </article>
+          <article class="rai-tile">
+            <p class="rai-kicker"><span>4</span>Privacy</p>
+            <p class="rai-big">0 foto's verstuurd</p>
+            <p class="rai-text">Het model draait in je browser. Er is geen server die je foto ziet of bewaart.</p>
+            <a class="rai-link" href="#own">Test je eigen afval</a>
+          </article>
+          <article class="rai-tile dark">
+            <p class="rai-kicker"><span>5</span>Menselijke controle</p>
+            <p class="rai-big">Jij beslist.</p>
+            <p class="rai-text">Het model kent materialen, geen gemeenteregels, en kiest altijd één van vijf, ook bij een batterij. Gebruik het als hint, niet als besluit.</p>
+            <a class="rai-link" href="#spel">Speel tegen de AI</a>
+          </article>
+          <article class="rai-tile">
+            <p class="rai-kicker"><span>6</span>Duurzaamheid</p>
+            <p class="rai-big" id="rai-green-big"></p>
+            <p class="rai-text" id="rai-green"></p>
+            <a class="rai-link" href="#data">Zie hoe het leerde</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 VRAGEN -->
     <section class="chapter field-cream" id="vragen" aria-labelledby="vragen-title">
       <div class="wrap faq-wrap">
-        <h2 class="head" id="vragen-title">Goed om te weten</h2>
+        <h2 class="head" id="vragen-title">Meer weten</h2>
         <div class="faq">
-          <details name="faq" open>
-            <summary>Betekent 99% zeker dat het klopt?</summary>
-            <p id="faq-confidence"></p>
-          </details>
-          <details name="faq">
-            <summary>Waarom gaat het mis op een donkere tafel?</summary>
-            <p>Alle trainingsfoto's hebben een witte achtergrond. Het eigen CNN leerde dat wit erbij hoort, en raakt de weg kwijt als dat ontbreekt. Echt afval ligt in een keuken of container: vies, verfrommeld, rommelige ondergrond. De testscore geldt alleen voor foto's zoals in TrashNet.</p>
-          </details>
           <details name="faq">
             <summary>Waarom is restafval het moeilijkst?</summary>
             <p>Er zijn maar <span data-fill="n-trash">137</span> foto's van, tegen <span data-fill="n-paper">997</span> van papier en karton. Fouten op restafval telden bij het trainen zwaarder mee, maar meer voorbeelden is daar geen vervanging voor.</p>
@@ -209,18 +250,6 @@
           <details name="faq">
             <summary>Vijf soorten, vijf bakken?</summary>
             <p>Nee. Het model kent materialen, geen regels. In veel gemeenten gaan plastic, metaal en drinkpakken samen in de PMD-bak; elders haalt de verwerker plastic achteraf uit het restafval. Een gebruikte tissue is papier, maar hoort bij het restafval. Batterijen, elektronica of verf kent het model niet eens: het kiest altijd één van de vijf. Twijfel je, kijk dan in de afvalwijzer van je gemeente.</p>
-          </details>
-          <details name="faq">
-            <summary>Moet ik het model vertrouwen?</summary>
-            <p>Gebruik het als hint, niet als besluit. Een fout antwoord ziet er precies zo uit als een goed antwoord: één label met een hoog percentage. Liggen twee soorten dicht bij elkaar, of gaat het ergens om, kijk dan zelf.</p>
-          </details>
-          <details name="faq">
-            <summary>Wordt mijn foto opgeslagen?</summary>
-            <p>Nee. De modellen worden één keer gedownload en draaien daarna in je browser. Er is geen server die foto's ontvangt of bewaart.</p>
-          </details>
-          <details name="faq">
-            <summary>Wat kost zo'n model?</summary>
-            <p id="faq-cost"></p>
           </details>
           <details name="faq">
             <summary>Rekent je browser hetzelfde als Python?</summary>

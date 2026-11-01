@@ -885,15 +885,37 @@ function renderMoment() {
   }
 }
 
-// ---------- 7 vragen ----------
+// ---------- 7 responsible AI ----------
+
+function renderRai() {
+  const c = state.evaluation.cnn;
+  const mob = state.evaluation.mobilenet;
+  const f = state.data.trashnet_folders;
+  const exps = state.variations.experiments;
+  const get = (name, level) => exps.find((e) => e.name === name).results.find((r) => r.level === level).accuracy.cnn;
+  const rows = [
+    { label: 'Wit papier (zoals getraind)', v: get('licht', 1), base: true },
+    { label: 'Donkere tafel, foto 75%', v: get('kleiner op donker', 0.75) },
+    { label: 'Half zoveel licht', v: get('licht', 0.5) },
+  ];
+  $('#rai-bias-bars').innerHTML = `<p class="rai-bars-title">Eigen CNN, % goed op 380 testfoto's</p>${rows.map((r) => `
+    <div class="rai-bar${r.base ? ' base' : ''}"><span>${esc(r.label)}</span><b>${fmtPct(r.v, 1)}</b>
+      <i style="width:${(r.v * 100).toFixed(1)}%"></i></div>`).join('')}`;
+  $('#rai-bias').textContent = `Elke trainingsfoto: wit papier, één schoon voorwerp. Daarbuiten zakt het eigen CNN fors. En restafval had maar ${fmtNum(f.trash)} foto's, tegen ${fmtNum(f.paper + f.cardboard)} van papier en karton.`;
+
+  const share = (e) => e.confident_mistakes / e.mistakes.length;
+  $('#rai-trust-big').textContent = fmtPct(share(mob));
+  $('#rai-trust').textContent = `van de fouten van MobileNet was minstens 80% zeker; bij het eigen CNN ${fmtPct(share(c))}. Een fout antwoord ziet er even stellig uit als een goed.`;
+
+  const min = (id) => fmtNum(state.history[id].seconds / 60, 1);
+  const mb = (id) => fmtNum(state.onnx.find((o) => o.model === id).onnx_bytes / 1e6, 1);
+  $('#rai-green-big').textContent = `${min('cnn')} min`;
+  $('#rai-green').textContent = `training van het eigen CNN op één videokaart; het model is ${mb('cnn')} MB en voorspelt op jouw apparaat. MobileNet trainde hier ${min('mobilenet')} min (${mb('mobilenet')} MB), maar leunt op een eerdere training met 1,2 miljoen foto's die je hier niet ziet.`;
+}
+
+// ---------- 8 vragen ----------
 
 function renderFaq() {
-  const c = state.evaluation.cnn;
-  $('#faq-confidence').textContent = `Nee. Bij goede antwoorden was het eigen CNN gemiddeld ${fmtPct(c.mean_confidence_correct)} zeker, bij foute ${fmtPct(c.mean_confidence_wrong)}. Dat scheelt, maar ${c.confident_mistakes} van zijn ${c.mistakes.length} fouten waren toch minstens 80% zeker. Zekerheid zegt hoe het model zich voelt, niet of het klopt.`;
-  const sec = (id) => state.history[id].seconds;
-  const mb = (id) => fmtNum(state.onnx.find((o) => o.model === id).onnx_bytes / 1e6, 1);
-  $('#faq-cost').textContent = `Het eigen CNN trainde ${fmtNum(sec('cnn') / 60, 1)} minuten op één videokaart (RTX 2070) en is ${mb('cnn')} MB. MobileNet trainde hier ${fmtNum(sec('mobilenet') / 60, 1)} minuten en is ${mb('mobilenet')} MB, maar leunt op een eerdere training op 1,2 miljoen foto's die veel meer rekenkracht kostte. Voorspellen gebeurt daarna op jouw apparaat, zonder datacenter.`;
-
   const f = state.data.trashnet_folders;
   const fill = {
     'n-images': fmtNum(sum(Object.values(f))),
@@ -1014,6 +1036,7 @@ async function init() {
   setLive(false);
   renderVariations();
   renderMoment();
+  renderRai();
   renderFaq();
   $('#pixel-canvas').addEventListener('pointermove', pixelHover);
 
