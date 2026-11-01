@@ -192,20 +192,21 @@ function niceTicks(max, count = 4) {
   return ticks;
 }
 
-// Modellijn + markering: eigen CNN zwart met vierkant, MobileNet grijs met rondje
+// Modellijn + markering, zonder kleur (zoals een bouwtekening):
+// eigen CNN = doorgetrokken lijn met dicht vierkant, MobileNet = stippellijn met open rondje
 const LINE = {
-  cnn: { color: 'var(--m-cnn)', width: 2.5, dash: '' },
-  mobilenet: { color: 'var(--m-mob)', width: 2.5, dash: '' },
+  cnn: { color: 'var(--ink)', width: 2, dash: '' },
+  mobilenet: { color: 'var(--ink)', width: 2, dash: '6 4' },
 };
 function marker(id, x, y, r = 5) {
-  const c = LINE[id].color;
   return id === 'cnn'
-    ? `<rect x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" fill="${c}" stroke="var(--paper)" stroke-width="2"/>`
-    : `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="var(--paper)" stroke-width="2"/>`;
+    ? `<rect x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" fill="var(--ink)"/>`
+    : `<circle cx="${x}" cy="${y}" r="${r - 0.5}" fill="var(--bg)" stroke="var(--ink)" stroke-width="2"/>`;
 }
+const linePath = (id, d) => `<path class="series-line" d="${d}" stroke="${LINE[id].color}" stroke-width="${LINE[id].width}"${LINE[id].dash ? ` stroke-dasharray="${LINE[id].dash}"` : ''}/>`;
 function modelLegend(container) {
-  container.innerHTML = MODELS.map((m) => `<span class="key"><svg width="30" height="12">
-    <line x1="0" y1="6" x2="30" y2="6" stroke="${LINE[m.id].color}" stroke-width="2.5"/>${marker(m.id, 15, 6, 4)}</svg>${esc(m.name)}</span>`).join('');
+  container.innerHTML = MODELS.map((m) => `<span class="key"><svg width="34" height="12">
+    ${linePath(m.id, 'M0,6L34,6')}${marker(m.id, 17, 6, 4)}</svg>${esc(m.name)}</span>`).join('');
 }
 
 // ---------- voorspellen ----------
@@ -317,10 +318,11 @@ function renderGame() {
   }
 
   game.innerHTML = `
-    <div class="card-photo">
+    <figure class="card-photo">
       <img src="${exampleUrl(ex)}" alt="Foto ${g.i + 1} van ${g.rounds.length}">
       ${entry && ex.note ? `<span class="tag">${esc(ex.note)}</span>` : ''}
-    </div>
+      <figcaption class="fig-cap">FIG. ${g.i + 1}/${g.rounds.length} — testfoto · 320 × 240 px${entry ? ` · ${esc(ex.file)}` : ''}</figcaption>
+    </figure>
     <div class="game-side">
       <p class="game-q">${entry ? (entry.you === ex.label ? 'Goed gesorteerd.' : `Het was ${esc(cls(ex.label))}.`) : 'In welke bak hoort dit?'}</p>
       ${bins({ interactive: !entry, marks })}
@@ -354,7 +356,7 @@ function renderGameEnd() {
   const n = g.rounds.length;
   const disagree = g.log.filter((e) => e.picks.cnn !== e.picks.mobilenet).length;
   const best = Math.max(g.score.cnn, g.score.mobilenet);
-  const verdict = g.score.you > best ? 'Je wint.' : g.score.you === best ? 'Gelijkspel.' : 'De AI wint.';
+  const verdict = g.score.you > best ? 'Je wint' : g.score.you === best ? 'Gelijkspel' : 'De AI wint';
   const sureWrong = g.log.flatMap((e, i) => MODELS.filter((m) => e.picks[m.id] !== g.rounds[i].label && e.probs[m.id][e.picks[m.id]] >= SURE)).length;
   $('#game').innerHTML = `<div class="game-end">
     <p class="giant">${verdict}</p>
@@ -609,7 +611,7 @@ function renderCurves() {
     const d = h.history.map((e, i) => `${i ? 'L' : 'M'}${x(e.epoch).toFixed(1)},${y(e.val[metric]).toFixed(1)}`).join('');
     const best = h.history[h.best_epoch - 1];
     const last = h.history.at(-1);
-    return `<path class="series-line" d="${d}" stroke="${LINE[mod.id].color}" stroke-width="${LINE[mod.id].width}"/>
+    return `${linePath(mod.id, d)}
       ${marker(mod.id, x(best.epoch), y(best.val[metric]))}
       <text class="label-text" x="${x(last.epoch) + 8}" y="${y(last.val[metric]) + (mod.id === 'cnn' ? 14 : -6)}">${esc(mod.name)}</text>`;
   }).join('');
@@ -844,7 +846,7 @@ function renderVariations() {
       ${[0, 0.5, 1].map((t) => `<line class="grid-line" x1="${m.left}" x2="${W - m.right}" y1="${y(t)}" y2="${y(t)}"/><text class="axis-text" x="${m.left - 6}" y="${y(t) + 4}" text-anchor="end">${fmtPct(t)}</text>`).join('')}
       <line class="crosshair" x1="${x(neutralIdx)}" x2="${x(neutralIdx)}" y1="${m.top}" y2="${m.top + ih}" stroke-dasharray="3 3"/>
       ${exp.results.map((r, i) => `<text class="axis-text" x="${x(i)}" y="${H - 6}" text-anchor="middle"${i === neutralIdx ? ' style="font-weight:700;fill:var(--ink)"' : ''}>${fmtLevel(r.level)}</text>`).join('')}
-      ${MODELS.map((mod) => `<path class="series-line" stroke="${LINE[mod.id].color}" stroke-width="${LINE[mod.id].width}" d="${exp.results.map((r, i) => `${i ? 'L' : 'M'}${x(i)},${y(r.accuracy[mod.id])}`).join('')}"/>`).join('')}
+      ${MODELS.map((mod) => linePath(mod.id, exp.results.map((r, i) => `${i ? 'L' : 'M'}${x(i)},${y(r.accuracy[mod.id])}`).join(''))).join('')}
       ${MODELS.map((mod) => exp.results.map((r, i) => marker(mod.id, x(i), y(r.accuracy[mod.id]), 4)).join('')).join('')}
       ${exp.results.map((r, i) => `<rect x="${x(i) - iw / (n - 1) / 2}" y="${m.top}" width="${iw / (n - 1)}" height="${ih}" fill="transparent" data-tip="${esc(`<b>${cap(exp.name)}: ${fmtLevel(r.level)} ${exp.unit}</b>${i === neutralIdx ? ' (origineel)' : ''}<br>${MODELS.map((mod) => `${mod.name} ${fmtPct(r.accuracy[mod.id], 1)}`).join('<br>')}`)}"/>`).join('')}
     </svg>`;
@@ -852,7 +854,7 @@ function renderVariations() {
   const get = (name, level) => exps.find((e) => e.name === name).results.find((r) => r.level === level).accuracy;
   const base = get('licht', 1);
   const dark = get('licht', 0.5);
-  $('#var-note').textContent = `Gestippeld = de originele foto. Voorbeeld: op half licht zakt het eigen CNN van ${fmtPct(base.cnn, 1)} naar ${fmtPct(dark.cnn, 1)} goed, MobileNet blijft op ${fmtPct(dark.mobilenet, 1)}. Ondersteboven gaat beter dan schuin: bij het trainen werden foto's gespiegeld, en twee keer spiegelen is 180° draaien.`;
+  $('#var-note').textContent = `De verticale stippellijn is de originele foto. Voorbeeld: op half licht zakt het eigen CNN van ${fmtPct(base.cnn, 1)} naar ${fmtPct(dark.cnn, 1)} goed, MobileNet blijft op ${fmtPct(dark.mobilenet, 1)}. Ondersteboven gaat beter dan schuin: bij het trainen werden foto's gespiegeld, en twee keer spiegelen is 180° draaien.`;
 }
 
 // ---------- 6 zeker ≠ juist ----------

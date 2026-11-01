@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Welke bak?</title>
   <meta name="description" content="Sorteer afval tegen twee AI-modellen. Zie hoe een zelf getraind CNN kijkt, hoe vaak het gelijk heeft en wanneer het overtuigd de mist in gaat.">
-  <meta name="theme-color" content="#141414">
+  <meta name="theme-color" content="#0000ee">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@400..900&family=Roboto+Mono:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
   <!-- HERO -->
-  <header class="hero field-paper" id="top">
+  <header class="hero field-blue" id="top">
     <nav class="bar" aria-label="Onderdelen">
       <a class="wordmark" href="#top">Welke bak?</a>
       <div class="bar-links">
@@ -41,8 +41,9 @@
 
   <main>
     <!-- 1 SPEL -->
-    <section class="chapter field-cream" id="spel" aria-labelledby="spel-title">
+    <section class="chapter field-grey" id="spel" aria-labelledby="spel-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[01] spel</p>
         <div class="chapter-head">
           <h2 class="head" id="spel-title">Sorteer mee</h2>
           <p class="lead">Acht foto's die de AI's nooit zagen. Kies eerst zelf, dan zie je wat ze zeiden.</p>
@@ -66,8 +67,9 @@
     </section>
 
     <!-- 2 MACHINE -->
-    <section class="chapter field-black" id="machine" aria-labelledby="machine-title">
+    <section class="chapter field-blue" id="machine" aria-labelledby="machine-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[02] hoe het kijkt</p>
         <div class="chapter-head">
           <h2 class="head" id="machine-title">Hoe het kijkt</h2>
           <p class="lead">Van foto naar oordeel in vier stappen. Dit is het eigen CNN, live op jouw foto.</p>
@@ -102,8 +104,9 @@
     </section>
 
     <!-- 3 DATA -->
-    <section class="chapter field-paper" id="data" aria-labelledby="data-title">
+    <section class="chapter field-grey2" id="data" aria-labelledby="data-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[03] data</p>
         <div class="chapter-head">
           <h2 class="head" id="data-title">Alles wat het zag</h2>
           <p class="lead"><span data-fill="n-images">2.527</span> foto's uit <a href="https://github.com/garythung/trashnet">TrashNet</a>. Eén vakje is één foto. Allemaal op wit papier, één voorwerp, iPhone.</p>
@@ -123,8 +126,9 @@
     </section>
 
     <!-- 4 TOETS -->
-    <section class="chapter field-cream" id="toets" aria-labelledby="toets-title">
+    <section class="chapter field-grey" id="toets" aria-labelledby="toets-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[04] eindtoets</p>
         <div class="chapter-head">
           <h2 class="head" id="toets-title">De eindtoets</h2>
           <p class="lead"><span data-fill="n-test">380</span> nieuwe foto's. Eén vakje per foto.</p>
@@ -150,8 +154,9 @@
     </section>
 
     <!-- 5 LAB -->
-    <section class="chapter field-paper" id="lab" aria-labelledby="lab-title">
+    <section class="chapter field-grey2" id="lab" aria-labelledby="lab-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[05] lab</p>
         <div class="chapter-head">
           <h2 class="head" id="lab-title">Breek het</h2>
           <p class="lead">Echt afval ligt niet op wit papier. Draai aan de knoppen.</p>
@@ -177,8 +182,9 @@
     </section>
 
     <!-- 6 ZEKER ≠ JUIST -->
-    <section class="chapter field-black" id="zeker" aria-labelledby="zeker-title">
+    <section class="chapter field-blue" id="zeker" aria-labelledby="zeker-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[06] zekerheid</p>
         <div class="moment">
           <img id="moment-img" alt="Tijdschriftpagina vol kleurige plaatjes" src="../assets/examples/paper93.jpg">
           <div>
@@ -191,8 +197,9 @@
     </section>
 
     <!-- 7 RESPONSIBLE AI -->
-    <section class="chapter field-paper" id="rai" aria-labelledby="rai-title">
+    <section class="chapter field-grey" id="rai" aria-labelledby="rai-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[07] responsible ai</p>
         <div class="chapter-head">
           <h2 class="head" id="rai-title">Responsible AI</h2>
           <p class="lead">Zes vragen om aan elk AI-systeem te stellen. Zo staat deze ervoor, gemeten.</p>
@@ -239,8 +246,9 @@
     </section>
 
     <!-- 8 VRAGEN -->
-    <section class="chapter field-cream" id="vragen" aria-labelledby="vragen-title">
+    <section class="chapter field-grey2" id="vragen" aria-labelledby="vragen-title">
       <div class="wrap faq-wrap">
+        <p class="sec-label" aria-hidden="true">[08] meer weten</p>
         <h2 class="head" id="vragen-title">Meer weten</h2>
         <div class="faq">
           <details name="faq">
@@ -260,8 +268,9 @@
     </section>
 
     <!-- 9 OVER -->
-    <section class="chapter field-paper" id="over" aria-labelledby="over-title">
+    <section class="chapter field-grey" id="over" aria-labelledby="over-title">
       <div class="wrap">
+        <p class="sec-label" aria-hidden="true">[09] colofon</p>
         <h2 class="head" id="over-title">Hoe het gemaakt is</h2>
         <p class="story">
           Ik ben <strong>Nguyen Anh Le</strong>, en ik heb dit gemaakt als persoonlijk artefact voor school: de learning group <mark class="m0">computer vision</mark> in het semester <mark class="m2">Responsible Applied AI</mark> van HBO-ICT aan de Hogeschool van Amsterdam. Ik wilde weten hoe goed een model dat ik <mark class="m1">zelf vanaf nul train</mark> afval kan herkennen, en vooral waar het misgaat. Dus heb ik een compact CNN met vier lagen filters getraind in <mark class="m4">PyTorch</mark>, op <span data-fill="n-images">2.527</span> foto's uit TrashNet. Ter vergelijking heb ik een voorgetraind MobileNet, dat ImageNet al kende, kort bijgetraind op dezelfde foto's. Beide modellen draaien via <mark class="m4">ONNX Runtime Web</mark> in je browser, met <mark class="m3">tot op de pixel</mark> dezelfde voorbewerking als in Python. Elke score op deze pagina heb ik gemeten op <span data-fill="n-test">380</span> testfoto's die geen van beide modellen eerder zag.
@@ -271,7 +280,7 @@
     </section>
   </main>
 
-  <footer class="footer field-black">
+  <footer class="footer field-blue">
     <div class="wrap">
       <p class="footer-mark" aria-hidden="true">Welke bak?</p>
       <div class="footer-cols">
