@@ -550,3 +550,6 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
   .ch { grid-template-columns: 5em minmax(0, 1fr) 2.6em 5.6em; gap: 6px; }
   .feature-maps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+.file-note { background: var(--accent); color: var(--accent-ink); padding: 12px var(--side); font-weight: 700; }
+.file-note code { background: rgba(0, 0, 0, 0.18); padding: 0 4px; }

@@ -9,9 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2026-11-02">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
-  <script type="module" src="app.js"></script>
+  <!-- ?v=… : verhoog bij elke wijziging, anders kan een browser een oude app.js bij nieuwe HTML gebruiken -->
+  <script type="module" src="app.js?v=2026-11-02"></script>
 </head>
 <body>
   <header class="ide-top">
@@ -335,5 +336,18 @@
   </footer>
 
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+
+  <script>
+    // Als bestand geopend (dubbelklik) blokkeert de browser app.js; zeg dan wat wel werkt
+    if (location.protocol === 'file:') {
+      var s = document.getElementById('status');
+      s.dataset.state = 'error';
+      s.textContent = 'open via een webserver';
+      var note = document.createElement('p');
+      note.className = 'file-note';
+      note.innerHTML = 'Deze pagina werkt niet als los bestand. Start in <code>docs/Anh/waste-classifier/</code> een webserver met <code>python -m http.server 8000</code> en open <code>http://localhost:8000/explainer/</code>.';
+      document.body.prepend(note);
+    }
+  </script>
 </body>
 </html>

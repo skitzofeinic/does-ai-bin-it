@@ -5,7 +5,7 @@
 // Lukt het laden van ONNX Runtime niet, dan gebruikt de pagina de vooraf in Python
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
-import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js';
+import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js?v=2026-11-02';
 
 const ORT_VERSION = '1.20.1';
 const MAX_UPLOAD_BYTES = 20e6;
