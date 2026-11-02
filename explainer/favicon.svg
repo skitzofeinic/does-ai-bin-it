@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- vrolijke bak: handvat, deksel, romp met smiley, wieltjes -->
+  <rect x="12.5" y="1.5" width="7" height="3.5" fill="none" stroke="#232327" stroke-width="2"/>
+  <rect x="3" y="5" width="26" height="4.5" fill="#232327"/>
+  <rect x="5.5" y="9.5" width="21" height="18.5" fill="#ef233c" stroke="#232327" stroke-width="2"/>
+  <rect x="10.5" y="13.5" width="3.5" height="3.5" fill="#ffffff"/>
+  <rect x="18" y="13.5" width="3.5" height="3.5" fill="#ffffff"/>
+  <path d="M10.5 20.5 Q16 26 21.5 20.5" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+  <rect x="7.5" y="28" width="4.5" height="3" fill="#232327"/>
+  <rect x="20" y="28" width="4.5" height="3" fill="#232327"/>
+</svg>
