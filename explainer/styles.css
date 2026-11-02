@@ -1,5 +1,5 @@
 /* Wat bakt AI ervan? Ontwerp: een IDE, licht. Neutraal licht scherm, zachtzwarte tekst, voet en knoppen (tweede kleur),
-   fel rood als enige accent. De tabbalk heeft de paginakleur met een streep eronder. Tekst in JetBrains Mono, titels in IBM Plex Mono Bold, h1 in hoofdletters.
+   fel rood als enige accent. De tabbalk heeft de paginakleur met een streep eronder. Alles in JetBrains Mono, titels ExtraBold, h1 in hoofdletters.
    Geen afrondingen, 1px-lijnen, inhoud over de volle breedte. Animaties zonder easing (steps()),
    het deksel van een bak is open of dicht, zonder tussenstand.
    Kleur buiten het palet alleen als die een functie heeft: bakkleuren (welke bak), groen (goed,
@@ -25,7 +25,7 @@
   --good-mark: #22c55e;  /* fel groen voor stipjes en markeringen */
   --bad: #e0182f;
 
-  --font-head: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  --font-head: var(--font);
   --font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --step-small: clamp(0.74rem, 0.72rem + 0.1vw, 0.82rem);
   --step-body: clamp(0.9rem, 0.86rem + 0.15vw, 0.98rem);
@@ -67,7 +67,7 @@ button { font: inherit; color: inherit; }
 .field { color: var(--ink-2); }
 
 .giant, .head, .footer-mark {
-  font-family: var(--font-head); font-weight: 700; color: var(--ink);
+  font-family: var(--font-head); font-weight: 800; color: var(--ink);
   letter-spacing: -0.03em; line-height: 1;
 }
 /* grote cijfers en woorden: teksteditor-letter, vet */
