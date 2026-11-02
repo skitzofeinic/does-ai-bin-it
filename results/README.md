@@ -9,6 +9,7 @@ Alle cijfers hieronder zijn gemeten met de scripts in `src/`, op de vaste split 
 | `evaluation_<model>.json` | testmetrics, confusion matrix, alle foute voorspellingen | `src/evaluate.py --model` |
 | `near_duplicates.json` | kandidaat-duplicaten tussen train en test | `src/evaluate.py --duplicates` |
 | `parity_onnx.json` | PyTorch tegenover ONNX Runtime op de testset | `src/export.py` |
+| `variations.json` | accuracy na aanpassingen van licht, hoek, scherpte en ondergrond | `src/variations.py` |
 
 ## Testset
 
@@ -64,7 +65,35 @@ Dit is een **ondergrens**: de methode vindt alleen bijna identieke opnames, niet
 
 ## PyTorch tegenover ONNX
 
-Op alle 380 testfoto's geven de ONNX-modellen (ONNX Runtime, Python) **dezelfde voorspelling** als PyTorch. Het grootste verschil in een kans is 8,3·10⁻⁷ (CNN) en 7,6·10⁻⁶ (MobileNet). De vergelijking met de browser (ONNX Runtime Web) volgt in de explainer.
+Op alle 380 testfoto's geven de ONNX-modellen (ONNX Runtime, Python) **dezelfde voorspelling** als PyTorch. Het grootste verschil in een kans is 8,3·10⁻⁷ (CNN) en 7,6·10⁻⁶ (MobileNet).
+
+## Browser tegenover Python
+
+De explainer controleert dit live in de browser van de bezoeker (sectie "Meer weten") en toont de eigen uitkomst. Gemeten in Brave (Chromium), headless, over meerdere sessies:
+
+- **Verkleinen en uitsnijden**: in JavaScript bit voor bit gelijk aan Pillow/torchvision, op zes beeldformaten (automatische test `tests/test_preprocess_js.py`, ook het afronden bij een halve pixel).
+- **Zelfde pixels** (een synthetisch testbeeld uit een formule, zonder JPEG): grootste verschil in een kans 0,0005 procentpunt (CNN) en 0,008 tot 0,054 procentpunt (MobileNet). Dat is afronding van kommagetallen in ONNX Runtime Web; bij MobileNet stapelt die zich op over meer lagen.
+- **Echte JPEG-voorbeelden** (16 foto's × 2 modellen): steeds 32 van de 32 voorspellingen gelijk, maar de zekerheid verschilt 0,1 tot 2,6 procentpunt. Browsers openen een JPEG net iets anders dan Pillow (in onze meting was 37 tot 49% van de pixels 1 of 2 op 255 anders). Onzichtbaar, maar het model merkt het.
+
+## Variaties: buiten wit papier
+
+Eén aanpassing tegelijk op alle 380 testfoto's, gemeten met `src/variations.py` (accuracy):
+
+| Aanpassing | Eigen CNN | MobileNet |
+|---|---|---|
+| Origineel | 79,5% | 90,8% |
+| Half zoveel licht (0,5×) | 56,3% | 91,1% |
+| Twee keer zoveel licht (2×) | 52,9% | 78,9% |
+| 45° gedraaid | 73,7% | 84,0% |
+| 180° gedraaid | 77,4% | 91,6% |
+| Licht vervaagd (straal 4) | 56,1% | 78,2% |
+| Sterk vervaagd (straal 16) | 28,4% | 40,0% |
+| Op donkere ondergrond, foto 75% | 60,3% | 90,0% |
+| Op donkere ondergrond, foto 35% | 40,5% | 51,8% |
+
+- Het eigen CNN is gevoelig voor licht en achtergrond: het leerde de witte posterboard mee. MobileNet, met voorkennis uit ImageNet, merkt bijna niets van half licht of een iets kleinere foto op een donkere ondergrond.
+- Ondersteboven (180°) gaat beter dan schuin (45°): bij het trainen werden foto's horizontaal en verticaal gespiegeld, en twee keer spiegelen is 180° draaien.
+- Vervagen raakt beide modellen het hardst.
 
 ## Beperkingen
 
