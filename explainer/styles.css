@@ -443,11 +443,11 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .hard-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-bottom: 1px solid var(--line); }
 .hard-card div { padding: 10px 12px 12px; display: grid; gap: 4px; font-size: 0.74rem; }
 .hard-card b { font-size: 0.8rem; }
-.hard-card .row { display: flex; align-items: center; gap: 6px; color: var(--ink-2); }
-.hard-card .row i { width: 8px; height: 8px; display: inline-block; background: var(--ink); }
-.hard-card .row.mobilenet i { background: none; border: 1.5px dashed var(--ink); border-radius: 50%; }
-.hard-card .x { color: var(--bad); font-weight: 700; }
-.hard-card .v { color: var(--good); font-weight: 700; }
+.hard-card .row { display: flex; align-items: baseline; gap: 7px; color: var(--ink-2); }
+.hard-card .row i { width: 9px; height: 9px; flex: none; border-radius: 50%; transform: translateY(1px); }
+.hard-card .row.ok i { background: var(--good); }
+.hard-card .row.no i { background: var(--bad); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* responsible AI */
 .rai { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); }

@@ -953,7 +953,9 @@ function renderMoment() {
     const rows = MODELS.map((m) => {
       const p = ex2.probabilities[m.id];
       const k = argmax(p);
-      return `<span class="row ${m.id}"><i></i>${esc(m.short)}: ${esc(cls(k))} ${fmtPct(p[k])} ${k === ex2.label ? '<span class="v">✓</span>' : '<span class="x">✗</span>'}</span>`;
+      // Groene stip = goed, rode stip = fout; de tekst erachter is voor schermlezers
+      const ok = k === ex2.label;
+      return `<span class="row ${ok ? 'ok' : 'no'}"><i aria-hidden="true"></i><span class="sr">${ok ? 'goed' : 'fout'}: </span>${esc(m.short)}: ${esc(cls(k))} ${fmtPct(p[k])}</span>`;
     }).join('');
     const card = el('button', { type: 'button', class: 'hard-card', 'data-tip': 'Open in het lab' },
       `<img src="${exampleUrl(ex2)}" alt="" loading="lazy"><div><b>${esc(ex2.note)}</b><span>Echt: ${esc(cls(ex2.label))}</span>${rows}</div>`);
