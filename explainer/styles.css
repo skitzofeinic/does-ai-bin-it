@@ -287,8 +287,6 @@ button.bin:disabled { cursor: default; }
 .game-q { font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.4rem); }
 .game-result { display: grid; gap: 2px; min-height: 3.2em; font-size: var(--step-body); }
 .game-result > span::before { content: '> '; color: var(--muted); }
-.game-result .ok { color: var(--good); font-weight: 700; }
-.game-result .no { color: var(--bad); font-weight: 700; }
 .game-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .game-end { grid-column: 1 / -1; display: grid; gap: 18px; justify-items: start; }
 .game-end .giant { font-size: clamp(2.4rem, 1.2rem + 4vw, 5rem); }
@@ -465,12 +463,12 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .lab-verdicts { display: grid; gap: 14px; }
 .verdict { border: 1px solid var(--line); background: var(--panel); padding: 12px 14px; display: grid; gap: 10px; }
 .verdict-head { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--step-small); text-transform: uppercase; border-bottom: 1px dashed var(--hair); padding-bottom: 6px; }
-.verdict-head i { width: 10px; height: 10px; display: inline-block; background: var(--ink); }
-.verdict-head.mobilenet i { background: none; border: 1.5px dashed var(--ink); border-radius: 50%; }
+.verdict-head > i { width: 10px; height: 10px; display: inline-block; background: var(--ink); }
+.verdict-head.mobilenet > i { background: none; border: 1.5px dashed var(--ink); border-radius: 50%; }
 .verdict-label { display: flex; align-items: center; gap: 10px; font-size: clamp(1.3rem, 1rem + 1.2vw, 1.9rem); }
 .verdict-label .swatch { width: 0.7em; height: 0.7em; background: var(--c); flex: none; }
 .verdict-pct { font-family: var(--font); color: var(--ink-2); font-weight: 400; font-size: 0.5em; }
-.badge { font-size: 0.75rem; font-weight: 700; margin-left: auto; text-transform: none; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; margin-left: auto; text-transform: none; }
 .badge.good { color: var(--good); }
 .badge.bad { color: var(--bad); }
 .measured { margin-top: clamp(3rem, 6vw, 5rem); border-top: 1px dashed var(--line); padding-top: 1.5rem; }
@@ -497,6 +495,9 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .hard-card .row i { width: 7px; height: 7px; flex: none; transform: translateY(-1px); }
 .hard-card .row.ok i { background: var(--good-mark); }
 .hard-card .row.no i { background: var(--bad); border-radius: 50%; } /* goed = groen vierkant, fout = rode stip */
+.dot { display: inline-block; width: 8px; height: 8px; margin-left: 6px; vertical-align: 1px; background: var(--good-mark); }
+.dot.no { background: var(--bad); border-radius: 50%; }
+.badge .dot { margin-left: 0; vertical-align: 0; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* responsible AI */

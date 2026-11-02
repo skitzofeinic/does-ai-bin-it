@@ -6,7 +6,7 @@
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
 import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js?v=2026-11-02';
-import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-04c';
+import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-05a';
 
 const ORT_VERSION = '1.20.1';
 const MAX_UPLOAD_BYTES = 20e6;
@@ -168,6 +168,9 @@ function segmented(container, options, current, onChange) {
   }
 }
 
+// Goed = groen vierkant, fout = rode stip; de tekst erachter is voor schermlezers
+const dot = (ok) => `<i class="dot ${ok ? 'ok' : 'no'}" aria-hidden="true"></i><span class="sr">${ok ? t('srOk') : t('srWrong')}</span>`;
+
 const chip = (model, p) => `<span class="chip ${model.id}"><i></i>${esc(model.short)} ${fmtPct(p)}</span>`;
 
 // Vijf bakken. marks[k] = { chips: [html], truth, dim }; interactive maakt er knoppen van
@@ -322,7 +325,7 @@ function renderGame() {
     marks = Object.fromEntries(state.data.classes.map((_, k) => [k, { chips: chipsAt[k], truth: k === ex.label, dim: !chipsAt[k] && k !== ex.label }]));
     const line = (who, k, p) => {
       const ok = k === ex.label;
-      return `<span><b>${esc(who)}</b>: ${esc(cls(k))}${p !== undefined ? `, ${t('sure', fmtPct(p))}` : ''} <span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span></span>`;
+      return `<span><b>${esc(who)}</b>: ${esc(cls(k))}${p !== undefined ? `, ${t('sure', fmtPct(p))}` : ''} ${dot(ok)}</span>`;
     };
     result = [line(t('you'), entry.you), ...MODELS.map((m) => line(m.name, entry.picks[m.id], entry.probs[m.id][entry.picks[m.id]]))].join('');
     const last = g.i === g.rounds.length - 1;
@@ -898,7 +901,7 @@ function renderVerdicts(result, label) {
     const p = result.probs[m.id];
     const k = argmax(p);
     let badge = '';
-    if (label !== null && label !== undefined) badge = k === label ? `<span class="badge good">${t('badgeOk')}</span>` : `<span class="badge bad">${t('badgeWrong')}</span>`;
+    if (label !== null && label !== undefined) badge = k === label ? `<span class="badge good">${dot(true)}${t('badgeOk')}</span>` : `<span class="badge bad">${dot(false)}${t('badgeWrong')}</span>`;
     return `<div class="verdict">
       <div class="verdict-head ${m.id}"><i></i>${esc(m.name)}${badge}</div>
       <div class="verdict-label" style="--c:${binColor(k)}"><span class="swatch"></span>${esc(cap(cls(k)))} <span class="verdict-pct">${fmtPct(p[k])}</span></div>

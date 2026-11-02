@@ -80,7 +80,7 @@ export const STRINGS = {
     tableNote: 'Precisie: als het model "glas" zegt, hoe vaak klopt dat? Recall: van alle glazen voorwerpen, hoeveel vond het?',
 
     verdictNoModels: 'Zonder geladen modellen kan deze foto niet beoordeeld worden.',
-    badgeOk: '✓ klopt', badgeWrong: '✗ fout',
+    badgeOk: 'klopt', badgeWrong: 'fout',
     exp: { 'licht': 'licht', 'draaien': 'draaien', 'vervagen': 'vervagen', 'kleiner op donker': 'kleiner op donker' },
     unit: { 'x helderheid': 'x helderheid', 'graden': 'graden', 'px straal': 'px straal', 'x formaat': 'x formaat' },
     original: ' (origineel)',
@@ -107,7 +107,7 @@ export const STRINGS = {
   },
 
   en: {
-    docTitle: 'Can AI bin it?',
+    docTitle: 'Does AI bin it?',
     docDesc: 'Sort waste against two AI models. See how a self-trained CNN looks, how often it is right and when it is confidently wrong.',
     classes: ['paper and cardboard', 'glass', 'plastic', 'metal', 'residual waste'],
     ownCnn: 'Own CNN',
@@ -179,7 +179,7 @@ export const STRINGS = {
     tableNote: 'Precision: when the model says "glass", how often is that right? Recall: of all glass objects, how many did it find?',
 
     verdictNoModels: 'Without loaded models this photo can\'t be judged.',
-    badgeOk: '✓ right', badgeWrong: '✗ wrong',
+    badgeOk: 'right', badgeWrong: 'wrong',
     exp: { 'licht': 'light', 'draaien': 'rotate', 'vervagen': 'blur', 'kleiner op donker': 'smaller on dark' },
     unit: { 'x helderheid': '× brightness', 'graden': 'degrees', 'px straal': 'px radius', 'x formaat': '× size' },
     original: ' (original)',
@@ -216,10 +216,10 @@ export const NOTES_EN = {
 };
 
 export const HTML_EN = {
-  ideTitle: 'can-ai-bin-it',
+  ideTitle: 'does-ai-bin-it',
   tab_spel: 'game.js', tab_machine: 'look.py', tab_data: 'data.csv', tab_toets: 'results.json', tab_lab: 'lab.js',
   tab_vertrouwen: 'confidence.md', tab_rai: 'responsible-ai.md', tab_vragen: 'faq.md', tab_over: 'colophon.md',
-  h1: 'Can AI<br>bin it?',
+  h1: 'Does AI<br>bin it?',
   heroLead: 'Two AIs sort waste from a photo. Play against them, look inside their heads, and find out when they are confidently wrong.',
   heroCta: 'Play: you vs AI',
   heroFine: 'A teaching example, not a waste guide: what goes in which bin differs per municipality.',
@@ -318,7 +318,7 @@ export const HTML_EN = {
   tldr6: 'Runs in your browser: your photo stays here',
   tldr7: 'All scores measured on <span data-fill="n-test">380</span> unseen photos',
 
-  footerMark: 'Can AI bin it?',
+  footerMark: 'Does AI bin it?',
   footerModels: '<h3>Models</h3><span>Own CNN, PyTorch</span><span>MobileNetV3-Small, torchvision</span><span>ONNX Runtime Web</span>',
   footerMade: '<h3>Made by</h3><span>Nguyen Anh Le</span><span>Computer vision learning group</span><span>Responsible Applied AI, ICT, AUAS</span>',
 };
