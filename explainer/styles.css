@@ -74,8 +74,8 @@ button { font: inherit; color: inherit; }
 .wordmark, .game-q, .exam-num, .fill-num, .score b, .rai-big, .verdict-label {
   font-family: var(--font); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: var(--ink);
 }
-.giant { font-size: var(--step-giant); text-transform: uppercase; }
-.head { font-size: var(--step-head); text-wrap: balance; font-weight: 600; } /* sectiekoppen: halfvet, de h1 blijft extra vet */
+.giant { font-size: var(--step-giant); text-transform: uppercase; font-weight: 600; }
+.head { font-size: var(--step-head); text-wrap: balance; font-weight: 600; } /* koppen halfvet, net als de h1 */
 h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.04em; }
 .lead { font-size: var(--step-lead); line-height: 1.5; color: var(--ink); }
 .fine { font-size: var(--step-small); color: var(--ink-2); }
