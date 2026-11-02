@@ -271,13 +271,19 @@ function newGame() {
 function renderScoreboard() {
   const g = state.game;
   const done = g.log.length;
-  const item = (id, label, value) => `<div class="score ${id}"><b>${value}</b><span><i></i>${esc(label)}</span></div>`;
+  // Jij tegen de modellen; wie voorop staat (ook bij gelijkspel) krijgt een omgekeerd vak
+  const best = Math.max(g.score.you, g.score.cnn, g.score.mobilenet);
+  const fighter = (id, label, value) => `<div class="fighter ${id}${best > 0 && value === best ? ' lead' : ''}">
+      <span class="f-name"><i></i>${esc(label)}</span><b>${value}</b></div>`;
+  const round = Math.min(g.i + 1, g.rounds.length);
   $('#scoreboard').innerHTML = `
-    ${item('you', 'Jij', g.score.you)}
-    ${item('cnn', 'Eigen CNN', g.score.cnn)}
-    ${item('mobilenet', 'MobileNet', g.score.mobilenet)}
-    <div class="rounds" aria-label="Ronde ${Math.min(g.i + 1, g.rounds.length)} van ${g.rounds.length}">${g.rounds
-      .map((_, i) => `<i class="${i < done ? 'done' : i === g.i ? 'now' : ''}"></i>`).join('')}</div>`;
+    <div class="versus">
+      ${fighter('you', 'Jij', g.score.you)}<span class="vs">vs</span>${fighter('cnn', 'Eigen CNN', g.score.cnn)}<span class="vs">vs</span>${fighter('mobilenet', 'MobileNet', g.score.mobilenet)}
+    </div>
+    <div class="rounds" aria-label="Ronde ${round} van ${g.rounds.length}">
+      <span class="fine">ronde ${round}/${g.rounds.length}</span>
+      ${g.rounds.map((_, i) => `<i class="${i < done ? 'done' : i === g.i ? 'now' : ''}"></i>`).join('')}
+    </div>`;
 }
 
 function renderGame() {

@@ -223,14 +223,26 @@ button.bin:disabled { cursor: default; }
 .fig-cap { font-size: 0.7rem; color: var(--ink-2); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
 
 /* spel */
-.scoreboard { display: flex; gap: clamp(16px, 4vw, 48px); flex-wrap: wrap; margin-bottom: 1.5rem; align-items: flex-end; border-bottom: 1px dashed var(--line); padding-bottom: 14px; }
+/* jij tegen de modellen, onder foto en bakken */
+.scoreboard { display: flex; gap: 16px 32px; flex-wrap: wrap; align-items: center; margin-top: 2rem; border-top: 1px dashed var(--line); padding-top: 18px; }
+.versus { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.fighter { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-width: 10.5em; padding: 8px 16px; border: 1px solid var(--ink); background: var(--panel); }
+.fighter b { font-size: clamp(2rem, 1.4rem + 2vw, 3.2rem); font-weight: 700; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.f-name { display: flex; align-items: center; gap: 7px; font-size: var(--step-small); font-weight: 700; text-transform: uppercase; color: var(--ink); }
+.f-name i { width: 9px; height: 9px; display: inline-block; background: currentColor; }
+.fighter.mobilenet .f-name i { background: none; border: 1.5px dashed currentColor; border-radius: 50%; }
+.fighter.you .f-name i { background: none; border: 3px double currentColor; }
+.fighter.lead { background: var(--ink); border-color: var(--ink); }
+.fighter.lead b, .fighter.lead .f-name { color: var(--bg); }
+.vs { font-size: 1.1rem; font-weight: 800; color: var(--accent); text-transform: uppercase; }
 .score { display: grid; gap: 4px; }
 .score b { font-size: clamp(2.6rem, 1.6rem + 3vw, 4.4rem); font-variant-numeric: tabular-nums; }
 .score span { font-size: var(--step-small); font-weight: 700; color: var(--ink-2); display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
 .score span i { width: 9px; height: 9px; display: inline-block; background: var(--ink); }
 .score.mobilenet span i { background: none; border: 1.5px dashed var(--ink); border-radius: 50%; }
 .score.you span i { background: none; border: 3px double var(--ink); }
-.rounds { display: flex; gap: 4px; margin-left: auto; align-self: center; }
+.rounds { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.rounds .fine { margin-right: 8px; }
 .rounds i { width: 14px; height: 14px; border: 1px solid var(--ink); }
 .rounds i.done { background: var(--ink); }
 .rounds i.now { background: var(--accent); border-color: var(--accent); }
@@ -557,6 +569,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
   .bin-label, .hero-bins .bin-label { font-size: 0.5rem; padding: 1px 2px; overflow-wrap: anywhere; hyphens: auto; }
   .bin.truth::after { font-size: 0.58rem; }
   .rounds { margin-left: 0; width: 100%; }
+  .versus { display: grid; grid-template-columns: 1fr; gap: 4px; width: 100%; }
+  .vs { justify-self: center; font-size: 0.9rem; }
   .pixel-panel { grid-template-columns: 1fr; }
   .ch { grid-template-columns: 5em minmax(0, 1fr) 2.6em 5.6em; gap: 6px; }
   .feature-maps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
