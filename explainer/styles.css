@@ -137,7 +137,7 @@ h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; text-transform: upperc
 }
 .hdr-status::before { content: '□'; color: var(--muted); }
 .hdr-status[data-state="ready"]::before { content: '■'; color: var(--good-mark); }
-.hdr-status[data-state="fallback"]::before, .hdr-status[data-state="error"]::before { content: '▲'; color: var(--bad); }
+.hdr-status[data-state="fallback"]::before, .hdr-status[data-state="error"]::before { content: '●'; color: var(--bad); }
 
 /* ---------- hero ---------- */
 .hero { min-height: calc(100svh - var(--chrome)); display: flex; flex-direction: column; overflow: hidden; }
@@ -449,7 +449,7 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .hard-card .row { display: flex; align-items: baseline; gap: 7px; color: var(--ink-2); }
 .hard-card .row i { width: 7px; height: 7px; flex: none; transform: translateY(-1px); }
 .hard-card .row.ok i { background: var(--good-mark); }
-.hard-card .row.no i { background: var(--bad); }
+.hard-card .row.no i { background: var(--bad); border-radius: 50%; } /* goed = groen vierkant, fout = rode stip */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* responsible AI */
@@ -489,7 +489,7 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .faq details[open] summary::after { content: '[-]'; }
 .faq p { margin-top: 10px; color: var(--ink-2); font-size: var(--step-small); }
 #parity[data-state="ok"]::before { content: '■ '; color: var(--good-mark); }
-#parity[data-state="warn"]::before { content: '■ '; color: var(--bad); }
+#parity[data-state="warn"]::before { content: '● '; color: var(--bad); }
 
 /* over */
 .colofon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: clamp(24px, 4vw, 64px); align-items: start; }
