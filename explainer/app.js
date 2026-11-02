@@ -415,7 +415,7 @@ function renderOwnResult() {
 function buildStrips() {
   for (const holder of document.querySelectorAll('[data-thumbs]')) {
     for (const ex of state.data.examples) {
-      const b = el('button', { type: 'button', 'aria-pressed': 'false', 'data-file': ex.file, 'data-tip': esc(`${cap(cls(ex.label))}${ex.note ? `: ${ex.note.toLowerCase()}` : ''}`), 'aria-label': cap(cls(ex.label)) },
+      const b = el('button', { type: 'button', 'aria-pressed': 'false', 'data-file': ex.file, 'data-tip': `${cap(cls(ex.label))}${ex.note ? `: ${ex.note.toLowerCase()}` : ''}`, 'aria-label': cap(cls(ex.label)) },
         `<img src="${exampleUrl(ex)}" alt="" loading="lazy">`);
       b.addEventListener('click', () => selectExample(ex));
       holder.append(b);
@@ -617,7 +617,8 @@ function renderBinFill() {
   const holder = $('#bin-fill');
   holder.innerHTML = '';
   classes.forEach((c, k) => {
-    const col = el('div', { class: 'fill-col', 'data-tip': esc(`<b>${cap(c)}</b><br>${fmtNum(counts[k])} foto's`) });
+    // el() zet attributen met setAttribute: niet escapen, anders staat <b> letterlijk in de tooltip
+    const col = el('div', { class: 'fill-col', 'data-tip': `<b>${cap(c)}</b><br>${fmtNum(counts[k])} foto's` });
     const W = COLS * (S + GAP) - GAP;
     const H = maxRows * (S + GAP) - GAP;
     const canvas = canvasOf(W * dpr, H * dpr);
