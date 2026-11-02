@@ -39,8 +39,6 @@ const state = {
   params: Object.fromEntries(SLIDERS.map((s) => [s.id, s.neutral])),
   game: null,
   curveMetric: 'accuracy',
-  confModel: 'cnn',
-  cmModel: 'cnn',
   testBusy: false,
   testPending: false,
 };
@@ -704,51 +702,67 @@ function renderCurves() {
   overlay.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); hideTip(); });
 }
 
-// ---------- 4 eindtoets ----------
+// ---------- 4 resultaten ----------
 
+const binChip = (k) => `<span class="bin-chip"><i style="background:${binColor(k)}"></i>${esc(cls(k))}</span>`;
+
+// Per model: één rij per soort, eerst goed (kleur), dan fout (open), dan overtuigd fout (rood)
 function renderExam() {
   $('#exam').innerHTML = MODELS.map((mod) => {
     const e = state.evaluation[mod.id];
-    const wrongByClass = state.data.classes.map((c) => e.mistakes.filter((x) => x.true === c));
-    const squares = state.data.classes.map((c, k) => {
+    const rows = state.data.classes.map((c, k) => {
       const correct = e.confusion_matrix[k][k];
-      const ok = Array.from({ length: correct }, () => `<i class="sq" style="--c:${binColor(k)}" data-tip="${esc(`<b>${cap(c)}</b>: goed`)}"></i>`).join('');
-      const wrong = wrongByClass[k]
-        .sort((a, b) => a.confidence - b.confidence)
-        .map((x) => `<i class="sq wrong${x.confidence >= SURE ? ' sure' : ''}" style="--c:${binColor(k)}" data-tip="${esc(`<b>${cap(x.true)}</b>, model zei <b>${x.predicted}</b><br>${fmtPct(x.confidence)} zeker · ${x.file.split('/')[1]}`)}"></i>`).join('');
-      return ok + wrong;
+      const total = sum(e.confusion_matrix[k]);
+      const wrong = e.mistakes.filter((x) => x.true === c).sort((a, b) => a.confidence - b.confidence);
+      const squares = Array.from({ length: correct }, () => `<i class="sq" style="--c:${binColor(k)}" data-tip="${esc(`<b>${cap(c)}</b>: goed`)}"></i>`).join('')
+        + wrong.map((x) => `<i class="sq wrong${x.confidence >= SURE ? ' sure' : ''}" style="--c:${binColor(k)}" data-tip="${esc(`<b>${cap(x.true)}</b>, model zei <b>${x.predicted}</b><br>${fmtPct(x.confidence)} zeker · ${x.file.split('/')[1]}`)}"></i>`).join('');
+      return `<div class="exam-row">
+        <span class="exam-cls">${binChip(k)}</span>
+        <div class="squares">${squares}</div>
+        <span class="exam-score mono">${correct}/${total}</span>
+      </div>`;
     }).join('');
     return `<div class="exam-model">
       <p class="exam-name ${mod.id}"><i></i>${esc(mod.name)}</p>
       <p class="exam-num">${fmtPct(e.accuracy, 1)}</p>
       <p class="exam-sub">${e.mistakes.length} fout van ${e.n_test} · ${e.confident_mistakes} daarvan minstens 80% zeker</p>
-      <div class="squares">${squares}</div>
+      <div class="exam-rows">${rows}</div>
     </div>`;
   }).join('');
 }
 
-function renderPairs() {
-  const e = state.evaluation[state.confModel];
-  const pairs = [];
-  e.confusion_matrix.forEach((row, i) => row.forEach((v, j) => { if (i !== j && v > 0) pairs.push({ i, j, v }); }));
-  pairs.sort((a, b) => b.v - a.v);
-  $('#pairs').innerHTML = pairs.slice(0, 4).map(({ i, j, v }) => `<li class="pair" data-tip="${esc(`${v} foto's ${cls(i)} werden ${cls(j)} genoemd`)}">
-    <span class="dot" style="--c:${binColor(i)}"></span>${esc(cap(cls(i)))}<span class="arrow">→</span><span class="dot" style="--c:${binColor(j)}"></span>${esc(cls(j))}<b>${v}×</b></li>`).join('');
+// Recall per soort, beide modellen naast elkaar: dicht = eigen CNN, gearceerd = MobileNet
+function renderClassBars() {
+  $('#class-legend').innerHTML = `<span class="key"><i class="cb-key cnn"></i>Eigen CNN</span><span class="key"><i class="cb-key mobilenet"></i>MobileNet</span>`;
+  $('#class-bars').innerHTML = state.data.classes.map((_, k) => `
+    <div class="cb-row">
+      <span class="cb-name">${binChip(k)}</span>
+      <div class="cb-bars">${MODELS.map((m) => {
+        const r = state.evaluation[m.id].per_class[k].recall;
+        return `<div class="cb-bar ${m.id}" data-tip="${esc(`<b>${m.name}</b>: ${fmtPct(r)} van de ${cls(k)}-foto's goed`)}">
+          <span class="cb-track"><i style="width:${(r * 100).toFixed(1)}%"></i></span><b class="mono">${fmtPct(r)}</b></div>`;
+      }).join('')}</div>
+    </div>`).join('');
 }
 
-function renderConfusion() {
-  const e = state.evaluation[state.cmModel];
-  const classes = e.classes;
-  const head = `<tr><th></th>${classes.map((c) => `<th>${esc(cap(c))}</th>`).join('')}</tr>`;
-  const body = e.confusion_matrix.map((row, i) => {
-    const total = sum(row);
-    return `<tr><th>${esc(cap(classes[i]))}</th>${row.map((v, j) => {
-      const share = total ? v / total : 0;
-      const ink = share > 0.45 ? '#ffffff' : 'var(--ink)';
-      return `<td style="background:rgba(20,20,20,${(share * 0.9).toFixed(3)});color:${ink}" data-tip="${esc(`Echt <b>${classes[i]}</b>, model zei <b>${classes[j]}</b><br>${v} foto's (${fmtPct(share)})`)}">${v || ''}</td>`;
-    }).join('')}</tr>`;
+// De vier grootste verwarringen per model, als leesbare zin met een balk (aandeel van die soort)
+function renderMixups() {
+  $('#mixups').innerHTML = MODELS.map((m) => {
+    const e = state.evaluation[m.id];
+    const pairs = [];
+    e.confusion_matrix.forEach((row, i) => row.forEach((v, j) => { if (i !== j && v > 0) pairs.push({ i, j, v, n: sum(row) }); }));
+    pairs.sort((a, b) => b.v - a.v);
+    return `<div class="mix-col">
+      <p class="exam-name ${m.id}"><i></i>${esc(m.name)}</p>
+      ${pairs.slice(0, 4).map(({ i, j, v, n }) => `
+        <div class="mix-row">
+          <b class="mix-count">${v}×</b>
+          <p class="mix-text">${binChip(i)} <span class="mix-arrow">aangezien voor</span> ${binChip(j)}</p>
+          <span class="mix-bar"><i style="width:${((v / n) * 100).toFixed(1)}%"></i></span>
+          <span class="mix-share fine">${v} van de ${n} ${esc(cls(i))}-foto's (${fmtPct(v / n)})</span>
+        </div>`).join('')}
+    </div>`;
   }).join('');
-  $('#chart-confusion').innerHTML = `<p class="fine">Rij = wat het echt is, kolom = wat het model zei.</p><table><thead>${head}</thead><tbody>${body}</tbody></table>`;
 }
 
 function renderClassTable() {
@@ -925,9 +939,13 @@ function renderMoment() {
   const worst = c.mistakes[0];
   const ex = state.data.examples.find((e) => e.source === worst.file);
   if (ex) $('#moment-img').src = exampleUrl(ex);
-  $('#moment-pct').textContent = fmtPct(worst.confidence);
   const share = (e) => e.confident_mistakes / e.mistakes.length;
-  $('#moment-text').textContent = `${ex?.note ? `${ex.note}: ` : ''}het eigen CNN zei ${worst.predicted}, het was ${worst.true}. Van al zijn fouten was ${fmtPct(share(c))} minstens 80% zeker. Bij MobileNet, het betere model: ${fmtPct(share(mb))}.`;
+  const k = (name) => state.data.classes.indexOf(name);
+  $('#moment-stats').innerHTML = `
+    <div><dt>zekerheid</dt><dd class="moment-pct">${fmtPct(worst.confidence)}</dd></div>
+    <div><dt>eigen CNN zei</dt><dd>${binChip(k(worst.predicted))}</dd></div>
+    <div><dt>het was</dt><dd>${binChip(k(worst.true))}</dd></div>`;
+  $('#moment-text').textContent = `${ex?.note ? `${ex.note}. ` : ''}Van alle fouten van het eigen CNN was ${fmtPct(share(c))} minstens 80% zeker. Bij MobileNet, het betere model: ${fmtPct(share(mb))}. Een fout antwoord ziet er net zo stellig uit als een goed.`;
 
   const holder = $('#hard');
   holder.innerHTML = '';
@@ -1105,11 +1123,9 @@ async function init() {
   segmented($('#curve-metric'), [{ id: 'accuracy', label: 'Goed' }, { id: 'loss', label: 'Fout-score (loss)' }], state.curveMetric, (id) => { state.curveMetric = id; renderCurves(); });
   renderCurves();
   renderExam();
-  segmented($('#conf-model'), MODELS.map((m) => ({ id: m.id, label: m.name })), state.confModel, (id) => { state.confModel = id; renderPairs(); });
-  renderPairs();
+  renderClassBars();
+  renderMixups();
   renderClassTable();
-  segmented($('#cm-model'), MODELS.map((m) => ({ id: m.id, label: m.name })), state.cmModel, (id) => { state.cmModel = id; renderConfusion(); });
-  renderConfusion();
   buildSliders();
   setLive(false);
   renderVariations();

@@ -21,7 +21,7 @@
       <a href="#spel" data-tab="spel">spel.js</a>
       <a href="#machine" data-tab="machine">kijk.py</a>
       <a href="#data" data-tab="data">data.csv</a>
-      <a href="#toets" data-tab="toets">toets.json</a>
+      <a href="#toets" data-tab="toets">resultaten.json</a>
       <a href="#lab" data-tab="lab">lab.js</a>
       <a href="#zeker" data-tab="zeker">zeker.md</a>
       <a href="#rai" data-tab="rai">responsible-ai.md</a>
@@ -36,7 +36,7 @@
       <h1 class="giant">Welke<br>bak?</h1>
       <div class="hero-side">
         <p class="lead">Twee AI's sorteren afval op een foto. Speel tegen ze, kijk mee in hun hoofd, en ontdek wanneer ze overtuigd de mist in gaan.</p>
-        <a class="button" href="#spel">Speel: jij tegen de AI</a>
+        <a class="button" href="#spel">Speel: jij vs AI</a>
         <p class="fine">Lesvoorbeeld, geen afvalwijzer: wat in welke bak mag, verschilt per gemeente.</p>
       </div>
     </div>
@@ -152,10 +152,10 @@
     <!-- 4 TOETS -->
     <section class="chapter field" id="toets" aria-labelledby="toets-title">
       <div class="wrap">
-        <p class="sec-label" aria-hidden="true">// 04 · toets.json</p>
+        <p class="sec-label" aria-hidden="true">// 04 · resultaten.json</p>
         <div class="chapter-head">
-          <h2 class="head" id="toets-title">De eindtoets</h2>
-          <p class="lead"><span data-fill="n-test">380</span> nieuwe foto's. Eén vakje per foto.</p>
+          <h2 class="head" id="toets-title">Resultaten</h2>
+          <p class="lead"><span data-fill="n-test">380</span> foto's die geen van beide modellen eerder zag. Eén vakje per foto, gesorteerd per soort.</p>
         </div>
         <div class="legend marks">
           <span><i class="mark ok"></i>goed (kleur van de bak)</span>
@@ -163,16 +163,20 @@
           <span><i class="mark sure"></i>fout én minstens 80% zeker</span>
         </div>
         <div class="exam" id="exam"></div>
-        <div class="confusions">
-          <h3>Meest verward</h3>
-          <div class="seg" id="conf-model"></div>
-          <ul class="pairs" id="pairs"></ul>
+        <div class="results-block">
+          <h3>Hoe vaak goed, per soort</h3>
+          <p class="fine">Van alle testfoto's van een soort: welk deel herkende elk model?</p>
+          <div class="legend" id="class-legend"></div>
+          <div class="class-bars" id="class-bars"></div>
+        </div>
+        <div class="results-block">
+          <h3>Waar gaat het mis?</h3>
+          <p class="fine">De vier keer dat een soort het vaakst voor een andere soort werd aangezien.</p>
+          <div class="mixups" id="mixups"></div>
         </div>
         <details class="more">
           <summary>Alle cijfers per soort</summary>
           <div id="table-classes"></div>
-          <div class="seg" id="cm-model"></div>
-          <div id="chart-confusion" class="confusion"></div>
         </details>
       </div>
     </section>
@@ -212,7 +216,8 @@
         <div class="moment">
           <img id="moment-img" alt="Tijdschriftpagina vol kleurige plaatjes" src="../assets/examples/paper93.jpg">
           <div>
-            <h2 class="giant moment-big" id="zeker-title"><span id="moment-pct">97%</span> zeker.<br><span class="moment-fout">Fout.</span></h2>
+            <h2 class="head" id="zeker-title">Vol vertrouwen in de verkeerde bak</h2>
+            <dl class="moment-stats" id="moment-stats"></dl>
             <p class="lead" id="moment-text"></p>
           </div>
         </div>
@@ -295,11 +300,25 @@
     <section class="chapter field" id="over" aria-labelledby="over-title">
       <div class="wrap">
         <p class="sec-label" aria-hidden="true">// 09 · colofon.md</p>
-        <h2 class="head" id="over-title">Hoe het gemaakt is</h2>
-        <p class="story">
-          Ik ben <strong>Nguyen Anh Le</strong>, en ik heb dit gemaakt als persoonlijk artefact voor school: de learning group <mark class="m0">computer vision</mark> in het semester <mark class="m2">Responsible Applied AI</mark> van HBO-ICT aan de Hogeschool van Amsterdam. Ik wilde weten hoe goed een model dat ik <mark class="m1">zelf vanaf nul train</mark> afval kan herkennen, en vooral waar het misgaat. Dus heb ik een compact CNN met vier lagen filters getraind in <mark class="m4">PyTorch</mark>, op <span data-fill="n-images">2.527</span> foto's uit TrashNet. Ter vergelijking heb ik een voorgetraind MobileNet, dat ImageNet al kende, kort bijgetraind op dezelfde foto's. Beide modellen draaien via <mark class="m4">ONNX Runtime Web</mark> in je browser, met <mark class="m3">tot op de pixel</mark> dezelfde voorbewerking als in Python. Elke score op deze pagina heb ik gemeten op <span data-fill="n-test">380</span> testfoto's die geen van beide modellen eerder zag.
-          <a class="story-end" href="#spel">Speel nog een keer.</a>
-        </p>
+        <div class="colofon">
+          <div class="colofon-text">
+            <h2 class="head" id="over-title">Hoe het gemaakt is</h2>
+            <p class="story">Gemaakt als persoonlijk artefact voor school: de learning group computer vision in het semester Responsible AI van ICT @ Hogeschool van Amsterdam. Ik wilde weten hoe goed een model dat ik zelf vanaf nul train afval kan herkennen, en vooral waar het misgaat. Dus heb ik een compact CNN met vier lagen filters getraind in PyTorch, op <span data-fill="n-images">2.527</span> foto's uit TrashNet. Ter vergelijking heb ik een voorgetraind MobileNet, dat ImageNet al kende, kort bijgetraind op dezelfde foto's. Beide modellen draaien via ONNX Runtime Web in je browser, met tot op de pixel dezelfde voorbewerking als in Python. Elke score op deze pagina heb ik gemeten op <span data-fill="n-test">380</span> testfoto's die geen van beide modellen eerder zag.</p>
+            <a class="story-end" href="#spel">Speel nog een keer.</a>
+          </div>
+          <aside class="tldr" aria-label="Samenvatting">
+            <p class="tldr-tab">tl;dr</p>
+            <ul>
+              <li>Persoonlijk artefact, learning group computer vision</li>
+              <li>Semester Responsible AI, ICT @ Hogeschool van Amsterdam</li>
+              <li>Eigen CNN, vanaf nul getraind in PyTorch</li>
+              <li>MobileNet (voorgetraind) ter vergelijking</li>
+              <li><span data-fill="n-images">2.527</span> foto's uit TrashNet</li>
+              <li>Draait in je browser: je foto blijft hier</li>
+              <li>Alle scores gemeten op <span data-fill="n-test">380</span> ongeziene foto's</li>
+            </ul>
+          </aside>
+        </div>
       </div>
     </section>
   </main>
