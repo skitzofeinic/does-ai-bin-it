@@ -1,4 +1,4 @@
-// Welke bak? Sorteerspel en explainer.
+// Wat bakt AI ervan? Sorteerspel en explainer.
 //
 // Alle cijfers komen uit bestanden die de Python-scripts schreven (data/web.json en
 // ../results/*.json); voorspellingen komen live uit de ONNX-modellen in ../model/.
