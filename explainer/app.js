@@ -1,7 +1,7 @@
 // Wat bakt AI ervan? Sorteerspel en explainer.
 //
-// Alle cijfers komen uit bestanden die de Python-scripts schreven (data/web.json en
-// ../results/*.json); voorspellingen komen live uit de ONNX-modellen in ../model/.
+// De pagina is waste-classifier/index.html. Alle cijfers komen uit bestanden die de Python-scripts
+// schreven (explainer/data/web.json en results/*.json); voorspellingen komen live uit model/*.onnx.
 // Lukt het laden van ONNX Runtime niet, dan gebruikt de pagina de vooraf in Python
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
@@ -112,7 +112,8 @@ function setStatus(stateName, text) {
   s.textContent = text;
 }
 
-const exampleUrl = (ex) => `../assets/examples/${ex.file}`;
+// Paden zijn relatief aan de pagina (waste-classifier/index.html), niet aan dit script
+const exampleUrl = (ex) => `assets/examples/${ex.file}`;
 
 // ---------- tooltip ----------
 
@@ -1076,7 +1077,7 @@ async function loadModels() {
     if (!window.ort) throw new Error('ONNX Runtime Web niet geladen');
     ort.env.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
     ort.env.wasm.numThreads = 1;
-    const sessions = await Promise.all(MODELS.map((m) => ort.InferenceSession.create(`../model/${m.id}.onnx`)));
+    const sessions = await Promise.all(MODELS.map((m) => ort.InferenceSession.create(`model/${m.id}.onnx`)));
     state.sessions = Object.fromEntries(MODELS.map((m, i) => [m.id, sessions[i]]));
   } catch (err) {
     console.error(err);
@@ -1105,13 +1106,13 @@ async function init() {
   setupIde();
   try {
     const [data, hc, hm, ec, em, variations, onnx] = await Promise.all([
-      loadJSON('data/web.json'),
-      loadJSON('../results/history_cnn.json'),
-      loadJSON('../results/history_mobilenet.json'),
-      loadJSON('../results/evaluation_cnn.json'),
-      loadJSON('../results/evaluation_mobilenet.json'),
-      loadJSON('../results/variations.json'),
-      loadJSON('../results/parity_onnx.json'),
+      loadJSON('explainer/data/web.json'),
+      loadJSON('results/history_cnn.json'),
+      loadJSON('results/history_mobilenet.json'),
+      loadJSON('results/evaluation_cnn.json'),
+      loadJSON('results/evaluation_mobilenet.json'),
+      loadJSON('results/variations.json'),
+      loadJSON('results/parity_onnx.json'),
     ]);
     Object.assign(state, { data, variations, onnx, history: { cnn: hc, mobilenet: hm }, evaluation: { cnn: ec, mobilenet: em } });
   } catch (err) {
