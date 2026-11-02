@@ -6,7 +6,7 @@
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
 import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js?v=2026-11-02';
-import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-04b';
+import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-04c';
 
 const ORT_VERSION = '1.20.1';
 const MAX_UPLOAD_BYTES = 20e6;

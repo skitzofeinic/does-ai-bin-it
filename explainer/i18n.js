@@ -320,7 +320,7 @@ export const HTML_EN = {
 
   footerMark: 'Can AI bin it?',
   footerModels: '<h3>Models</h3><span>Own CNN, PyTorch</span><span>MobileNetV3-Small, torchvision</span><span>ONNX Runtime Web</span>',
-  footerMade: '<h3>Made by</h3><span>Nguyen Anh Le</span><span>Computer vision learning group</span><span>Responsible Applied AI, HBO-ICT, AUAS</span>',
+  footerMade: '<h3>Made by</h3><span>Nguyen Anh Le</span><span>Computer vision learning group</span><span>Responsible Applied AI, ICT, AUAS</span>',
 };
 
 export const ATTR_EN = {
