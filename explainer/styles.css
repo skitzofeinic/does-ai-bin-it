@@ -465,6 +465,7 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .rai-big { font-size: clamp(1.9rem, 1.2rem + 2.2vw, 3rem); }
 .rai-big.alert { font-size: clamp(3.2rem, 1.8rem + 4.4vw, 5.6rem); }
 .rai-text { font-size: var(--step-small); color: var(--ink-2); line-height: 1.55; }
+.rai-did { font-size: var(--step-small); color: var(--ink); line-height: 1.55; border-left: 2px solid var(--accent); padding-left: 10px; }
 .rai-link { margin-top: auto; font-weight: 700; font-size: var(--step-small); text-underline-offset: 0.25em; }
 .rai-link::before { content: '^ '; }
 .rai-bars { display: grid; gap: 8px; }

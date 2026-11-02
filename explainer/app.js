@@ -982,6 +982,7 @@ function renderRai() {
     <div class="rai-bar${r.base ? ' base' : ''}"><span>${esc(r.label)}</span><b>${fmtPct(r.v, 1)}</b>
       <i style="width:${(r.v * 100).toFixed(1)}%"></i></div>`).join('')}`;
   $('#rai-bias').textContent = `Elke trainingsfoto: wit papier, één schoon voorwerp. Daarbuiten zakt het eigen CNN fors. En restafval had maar ${fmtNum(f.trash)} foto's, tegen ${fmtNum(f.paper + f.cardboard)} van papier en karton.`;
+  $('#rai-bias-did').textContent = 'Daarom telden fouten op kleine soorten zwaarder bij het trainen, staan de scores per soort, en laat het lab zien wat er buiten wit papier gebeurt.';
 
   const share = (e) => e.confident_mistakes / e.mistakes.length;
   $('#rai-trust-big').textContent = fmtPct(share(mob));
@@ -990,7 +991,8 @@ function renderRai() {
   const min = (id) => fmtNum(state.history[id].seconds / 60, 1);
   const mb = (id) => fmtNum(state.onnx.find((o) => o.model === id).onnx_bytes / 1e6, 1);
   $('#rai-green-big').textContent = `${min('cnn')} min`;
-  $('#rai-green').textContent = `training van het eigen CNN op één videokaart; het model is ${mb('cnn')} MB en voorspelt op jouw apparaat. MobileNet trainde hier ${min('mobilenet')} min (${mb('mobilenet')} MB), maar leunt op een eerdere training met 1,2 miljoen foto's die je hier niet ziet.`;
+  $('#rai-green').textContent = `training van het eigen CNN op één videokaart. MobileNet trainde hier ${min('mobilenet')} min (${mb('mobilenet')} MB), maar leunt op een eerdere training met 1,2 miljoen foto's die je hier niet ziet.`;
+  $('#rai-green-did').textContent = `Daarom een klein model (${mb('cnn')} MB) dat op jouw apparaat voorspelt, zonder datacenter. En niet langer trainen dan nuttig: MobileNet bleef op 15 rondes, omdat 30 rondes niets beters opleverde.`;
 }
 
 // ---------- 8 vragen ----------

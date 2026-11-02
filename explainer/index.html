@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap">
-  <link rel="stylesheet" href="styles.css?v=2026-11-02c">
+  <link rel="stylesheet" href="styles.css?v=2026-11-02d">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
   <!-- ?v=… : verhoog bij elke wijziging, anders kan een browser een oude app.js bij nieuwe HTML gebruiken -->
-  <script type="module" src="app.js?v=2026-11-02c"></script>
+  <script type="module" src="app.js?v=2026-11-02d"></script>
 </head>
 <body>
   <header class="ide-top">
@@ -232,43 +232,49 @@
         <p class="sec-label" aria-hidden="true">// 07 · responsible-ai.md</p>
         <div class="chapter-head">
           <h2 class="head" id="rai-title">Responsible AI</h2>
-          <p class="lead">Zes vragen om aan elk AI-systeem te stellen. Zo staat deze ervoor, gemeten.</p>
+          <p class="lead">Hoe ik in dit project verantwoord met AI omging: per principe wat ik vond, en wat ik eraan deed.</p>
         </div>
         <div class="rai">
           <article class="rai-tile dark">
             <p class="rai-kicker"><span>1</span>Datakwaliteit en bias</p>
             <div class="rai-bars" id="rai-bias-bars"></div>
             <p class="rai-text" id="rai-bias"></p>
+            <p class="rai-did" id="rai-bias-did"></p>
             <a class="rai-link" href="#lab">Test het in het lab</a>
           </article>
           <article class="rai-tile">
             <p class="rai-kicker"><span>2</span>Betrouwbaarheid</p>
             <p class="rai-big alert" id="rai-trust-big"></p>
             <p class="rai-text" id="rai-trust"></p>
+            <p class="rai-did">Daarom toont deze site altijd alle vijf percentages, niet alleen het winnende label, en zet overtuigde fouten apart, in rood.</p>
             <a class="rai-link" href="#vertrouwen">Bekijk de overtuigde fouten</a>
           </article>
           <article class="rai-tile">
             <p class="rai-kicker"><span>3</span>Transparantie</p>
             <p class="rai-big">49.152 → 5</p>
-            <p class="rai-text">Je ziet wat erin gaat, wat de filters vinden en wat eruit komt. Waaróm het model kiest, blijft deels verborgen: filters tonen wat het zoekt, niet wat het begrijpt.</p>
+            <p class="rai-text">Een neuraal netwerk legt niet uit waaróm het kiest.</p>
+            <p class="rai-did">Daarom laat deze site elke stap zien, live op jouw foto: de pixels, de 32 echte filters met hun gewichten, en de vijf percentages.</p>
             <a class="rai-link" href="#machine">Kijk mee in het model</a>
           </article>
           <article class="rai-tile">
             <p class="rai-kicker"><span>4</span>Privacy</p>
             <p class="rai-big">0 foto's verstuurd</p>
-            <p class="rai-text">Het model draait in je browser. Er is geen server die je foto ziet of bewaart.</p>
+            <p class="rai-text">Een foto van thuis kan meer laten zien dan alleen afval.</p>
+            <p class="rai-did">Daarom draait het model in je browser. Er is geen server die je foto ziet of bewaart.</p>
             <a class="rai-link" href="#own">Test je eigen afval</a>
           </article>
           <article class="rai-tile dark">
             <p class="rai-kicker"><span>5</span>Menselijke controle</p>
-            <p class="rai-big">Jij beslist.</p>
-            <p class="rai-text">Het model kent materialen, geen gemeenteregels, en kiest altijd één van vijf, ook bij een batterij. Gebruik het als hint, niet als besluit.</p>
+            <p class="rai-big">Jij eerst.</p>
+            <p class="rai-text">Een AI-antwoord kan je eigen oordeel sturen, ook als het fout is.</p>
+            <p class="rai-did">Daarom kies je in het spel eerst zelf, voordat je de AI ziet. De site neemt nooit zelf een besluit en zegt erbij dat het een lesvoorbeeld is, geen afvalwijzer.</p>
             <a class="rai-link" href="#spel">Speel tegen de AI</a>
           </article>
           <article class="rai-tile">
             <p class="rai-kicker"><span>6</span>Duurzaamheid</p>
             <p class="rai-big" id="rai-green-big"></p>
             <p class="rai-text" id="rai-green"></p>
+            <p class="rai-did" id="rai-green-did"></p>
             <a class="rai-link" href="#data">Zie hoe het leerde</a>
           </article>
         </div>
