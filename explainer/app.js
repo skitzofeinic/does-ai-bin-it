@@ -6,6 +6,7 @@
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
 import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js?v=2026-11-02';
+import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-04b';
 
 const ORT_VERSION = '1.20.1';
 const MAX_UPLOAD_BYTES = 20e6;
@@ -14,19 +15,25 @@ const ROUNDS = 8;
 const SURE = 0.8;
 
 const MODELS = [
-  { id: 'cnn', name: 'Eigen CNN', short: 'CNN' },
+  { id: 'cnn', get name() { return t('ownCnn'); }, short: 'CNN' },
   { id: 'mobilenet', name: 'MobileNet', short: 'MobileNet' },
 ];
 
 const SLIDERS = [
-  { id: 'licht', label: 'Licht', min: 0.25, max: 2, step: 0.05, neutral: 1, format: (v) => `${fmtNum(v, 2)}×` },
-  { id: 'draaien', label: 'Draaien', min: 0, max: 180, step: 5, neutral: 0, format: (v) => `${v}°` },
-  { id: 'vervagen', label: 'Vervagen', min: 0, max: 16, step: 1, neutral: 0, format: (v) => (v ? `straal ${v}` : 'scherp') },
+  { id: 'licht', min: 0.25, max: 2, step: 0.05, neutral: 1, format: (v) => `${fmtNum(v, 2)}×` },
+  { id: 'draaien', min: 0, max: 180, step: 5, neutral: 0, format: (v) => `${v}°` },
+  { id: 'vervagen', min: 0, max: 16, step: 1, neutral: 0, format: (v) => t('blurFmt', v) },
   // Hoeveel donkere tafel om de foto heen: de foto wordt (1 - waarde) zo groot
-  { id: 'tafel', label: 'Donkere tafel', min: 0, max: 0.65, step: 0.05, neutral: 0, format: (v) => (v > 0 ? `foto ${Math.round((1 - v) * 100)}%` : 'uit') },
+  { id: 'tafel', min: 0, max: 0.65, step: 0.05, neutral: 0, format: (v) => t('tableFmt', v > 0 ? Math.round((1 - v) * 100) : null) },
 ];
+for (const sl of SLIDERS) Object.defineProperty(sl, 'label', { get: () => t(`sl_${sl.id}`) });
 
 const state = {
+  lang: 'nl',
+  status: 'initial',
+  uploadError: null,
+  own: null,
+  parity: null,
   data: null,
   history: {},
   evaluation: {},
@@ -54,7 +61,7 @@ const el = (tag, attrs = {}, html = '') => {
 };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function fmtNum(x, digits = 0) {
-  return x.toLocaleString('nl-NL', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return x.toLocaleString(state.lang === 'en' ? 'en-GB' : 'nl-NL', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 // Nooit 100% tonen als het model niet precies 1 gaf; toPrecision haalt float-ruis weg (0.795 * 100)
 function fmtPct(x, digits = 0) {
@@ -66,7 +73,15 @@ function fmtPct(x, digits = 0) {
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const argmax = (arr) => arr.reduce((best, v, i) => (v > arr[best] ? i : best), 0);
 const sum = (arr) => arr.reduce((a, b) => a + b, 0);
-const cls = (k) => state.data.classes[k];
+// Tekst in de gekozen taal; een functie in STRINGS krijgt de invulwaarden
+function t(key, ...args) {
+  const v = STRINGS[state.lang][key];
+  return typeof v === 'function' ? v(...args) : v;
+}
+// Klassen heten in de data (web.json, evaluation_*.json) Nederlands; op het scherm in de gekozen taal
+const cls = (k) => t('classes')[k];
+const clsOf = (dutchName) => cls(state.data.classes.indexOf(dutchName));
+const noteOf = (ex) => (state.lang === 'en' && NOTES_EN[ex.file]) || ex.note;
 const binColor = (k) => `var(--bin-${k})`;
 function shuffle(arr) {
   const a = [...arr];
@@ -106,10 +121,11 @@ function drawCanvas(target, source) {
   target.getContext('2d').drawImage(source, 0, 0);
 }
 
-function setStatus(stateName, text) {
+function setStatus(stateName) {
+  state.status = stateName;
   const s = $('#status');
-  s.dataset.state = stateName;
-  s.textContent = text;
+  s.dataset.state = stateName === 'initial' ? 'loading' : stateName;
+  s.textContent = t(`st_${stateName}`);
 }
 
 // Paden zijn relatief aan de pagina (waste-classifier/index.html), niet aan dit script
@@ -156,7 +172,8 @@ const chip = (model, p) => `<span class="chip ${model.id}"><i></i>${esc(model.sh
 
 // Vijf bakken. marks[k] = { chips: [html], truth, dim }; interactive maakt er knoppen van
 function bins({ interactive = false, marks = {}, small = false } = {}) {
-  return `<div class="bins">${state.data.classes.map((c, k) => {
+  return `<div class="bins">${state.data.classes.map((_, k) => {
+    const c = cls(k);
     const m = marks[k] || {};
     const tag = interactive ? 'button' : 'div';
     const attrs = interactive ? ` type="button" data-pick="${k}" aria-label="${esc(cap(c))}"` : '';
@@ -170,7 +187,7 @@ function bins({ interactive = false, marks = {}, small = false } = {}) {
 
 function vbars(probs) {
   const k = argmax(probs);
-  return `<div class="vbars">${state.data.classes.map((c, i) => `
+  return `<div class="vbars">${t('classes').map((c, i) => `
     <div class="vbar${i === k ? ' win' : ''}" style="--c:${binColor(i)}">
       <div class="vbar-top"><span>${esc(cap(c))}</span><span class="mono">${fmtPct(probs[i])}</span></div>
       <div class="vbar-track"><div class="vbar-fill" style="width:${(probs[i] * 100).toFixed(1)}%"></div></div>
@@ -278,10 +295,10 @@ function renderScoreboard() {
   const round = Math.min(g.i + 1, g.rounds.length);
   $('#scoreboard').innerHTML = `
     <div class="versus">
-      ${fighter('you', 'Jij', g.score.you)}<span class="vs">vs</span>${fighter('cnn', 'Eigen CNN', g.score.cnn)}<span class="vs">vs</span>${fighter('mobilenet', 'MobileNet', g.score.mobilenet)}
+      ${fighter('you', t('you'), g.score.you)}<span class="vs">vs</span>${fighter('cnn', t('ownCnn'), g.score.cnn)}<span class="vs">vs</span>${fighter('mobilenet', 'MobileNet', g.score.mobilenet)}
     </div>
-    <div class="rounds" aria-label="Ronde ${round} van ${g.rounds.length}">
-      <span class="fine">ronde ${round}/${g.rounds.length}</span>
+    <div class="rounds" aria-label="${t('roundAria', round, g.rounds.length)}">
+      <span class="fine">${t('round', round, g.rounds.length)}</span>
       ${g.rounds.map((_, i) => `<i class="${i < done ? 'done' : i === g.i ? 'now' : ''}"></i>`).join('')}
     </div>`;
 }
@@ -300,29 +317,29 @@ function renderGame() {
   if (entry) {
     const chipsAt = {};
     const add = (k, html) => (chipsAt[k] ||= []).push(html);
-    add(entry.you, `<span class="chip you">Jij</span>`);
+    add(entry.you, `<span class="chip you">${esc(t('you'))}</span>`);
     for (const m of MODELS) add(entry.picks[m.id], chip(m, entry.probs[m.id][entry.picks[m.id]]));
     marks = Object.fromEntries(state.data.classes.map((_, k) => [k, { chips: chipsAt[k], truth: k === ex.label, dim: !chipsAt[k] && k !== ex.label }]));
     const line = (who, k, p) => {
       const ok = k === ex.label;
-      return `<span><b>${esc(who)}</b>: ${esc(cls(k))}${p !== undefined ? `, ${fmtPct(p)} zeker` : ''} <span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span></span>`;
+      return `<span><b>${esc(who)}</b>: ${esc(cls(k))}${p !== undefined ? `, ${t('sure', fmtPct(p))}` : ''} <span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span></span>`;
     };
-    result = [line('Jij', entry.you), ...MODELS.map((m) => line(m.name, entry.picks[m.id], entry.probs[m.id][entry.picks[m.id]]))].join('');
+    result = [line(t('you'), entry.you), ...MODELS.map((m) => line(m.name, entry.picks[m.id], entry.probs[m.id][entry.picks[m.id]]))].join('');
     const last = g.i === g.rounds.length - 1;
-    actions = `<button type="button" class="button" id="next">${last ? 'Bekijk de uitslag' : 'Volgende foto →'}</button>
-      <a class="button quiet" href="#machine">Hoe keek het CNN?</a>`;
+    actions = `<button type="button" class="button" id="next">${last ? t('seeResult') : t('nextPhoto')}</button>
+      <a class="button quiet" href="#machine">${t('howCnn')}</a>`;
   }
 
   game.innerHTML = `
     <figure class="card-photo">
-      <img src="${exampleUrl(ex)}" alt="Foto ${g.i + 1} van ${g.rounds.length}">
-      ${entry && ex.note ? `<span class="tag">${esc(ex.note)}</span>` : ''}
-      <figcaption class="fig-cap">FIG. ${g.i + 1}/${g.rounds.length} — testfoto · 320 × 240 px${entry ? ` · ${esc(ex.file)}` : ''}</figcaption>
+      <img src="${exampleUrl(ex)}" alt="${t('photoAlt', g.i + 1, g.rounds.length)}">
+      ${entry && ex.note ? `<span class="tag">${esc(noteOf(ex))}</span>` : ''}
+      <figcaption class="fig-cap">${t('figCap', g.i + 1, g.rounds.length)}${entry ? ` · ${esc(ex.file)}` : ''}</figcaption>
     </figure>
     <div class="game-side">
-      <p class="game-q">${entry ? (entry.you === ex.label ? 'Goed gesorteerd.' : `Het was ${esc(cls(ex.label))}.`) : 'In welke bak hoort dit?'}</p>
+      <p class="game-q">${entry ? (entry.you === ex.label ? t('goodSorted') : t('itWas', esc(cls(ex.label)))) : t('gameQ')}</p>
       ${bins({ interactive: !entry, marks })}
-      <div class="game-result">${result || '<span class="fine">Tik op een bak.</span>'}</div>
+      <div class="game-result">${result || `<span class="fine">${t('tapBin')}</span>`}</div>
       <div class="game-actions">${actions}</div>
     </div>`;
 
@@ -352,14 +369,14 @@ function renderGameEnd() {
   const n = g.rounds.length;
   const disagree = g.log.filter((e) => e.picks.cnn !== e.picks.mobilenet).length;
   const best = Math.max(g.score.cnn, g.score.mobilenet);
-  const verdict = g.score.you > best ? 'Je wint' : g.score.you === best ? 'Gelijkspel' : 'De AI wint';
+  const verdict = g.score.you > best ? t('win') : g.score.you === best ? t('draw') : t('aiWins');
   const sureWrong = g.log.flatMap((e, i) => MODELS.filter((m) => e.picks[m.id] !== g.rounds[i].label && e.probs[m.id][e.picks[m.id]] >= SURE)).length;
   $('#game').innerHTML = `<div class="game-end">
     <p class="giant">${verdict}</p>
-    <p class="lead">Jij ${g.score.you}, eigen CNN ${g.score.cnn}, MobileNet ${g.score.mobilenet} van de ${n}. De twee AI's waren het ${disagree} keer oneens${sureWrong ? `, en ${sureWrong} keer zat een AI er overtuigd naast (minstens 80% zeker)` : ''}.</p>
+    <p class="lead">${t('endText', g.score.you, g.score.cnn, g.score.mobilenet, n, disagree, sureWrong)}</p>
     <div class="game-actions">
-      <button type="button" class="button" id="again">Nog een keer</button>
-      <a class="button quiet" href="#machine">Kijk in het hoofd van de AI</a>
+      <button type="button" class="button" id="again">${t('again')}</button>
+      <a class="button quiet" href="#machine">${t('lookInside')}</a>
     </div>
   </div>`;
   $('#again').addEventListener('click', newGame);
@@ -380,25 +397,27 @@ function setupUpload() {
   });
 }
 
-function showUploadError(text) {
+function showUploadError(key) {
+  state.uploadError = key;
   const err = $('#upload-error');
-  err.textContent = text;
-  err.hidden = !text;
+  err.textContent = key ? t(key) : '';
+  err.hidden = !key;
 }
 
 async function handleFile(file) {
   if (!file) return;
-  if (!state.sessions) return showUploadError('Eigen foto\'s werken alleen als de modellen geladen zijn.');
-  if (!file.type.startsWith('image/')) return showUploadError('Dit is geen afbeelding. Kies een foto (bijvoorbeeld JPG, PNG of WebP).');
-  if (file.size > MAX_UPLOAD_BYTES) return showUploadError('Deze foto is groter dan 20 MB. Kies een kleinere.');
+  if (!state.sessions) return showUploadError('upNoModels');
+  if (!file.type.startsWith('image/')) return showUploadError('upNotImage');
+  if (file.size > MAX_UPLOAD_BYTES) return showUploadError('upTooBig');
   const url = URL.createObjectURL(file);
   try {
     const img = await loadImage(url);
-    showUploadError('');
+    showUploadError(null);
     await setSource({ img, name: file.name, label: null, example: null });
+    state.own = { probs: state.base.probs, canvas: state.source.base };
     renderOwnResult();
   } catch {
-    showUploadError('Deze foto kon niet worden geopend. Probeer een JPG of PNG.');
+    showUploadError('upBroken');
   } finally {
     URL.revokeObjectURL(url);
     $('#upload').value = '';
@@ -406,23 +425,26 @@ async function handleFile(file) {
 }
 
 function renderOwnResult() {
+  if (!state.own) return;
   const box = $('#own-result');
-  const probs = state.base.probs;
+  const { probs } = state.own;
   const chipsAt = {};
   for (const m of MODELS) (chipsAt[argmax(probs[m.id])] ||= []).push(chip(m, Math.max(...probs[m.id])));
   const marks = Object.fromEntries(state.data.classes.map((_, k) => [k, { chips: chipsAt[k], dim: !chipsAt[k] }]));
   box.hidden = false;
-  box.innerHTML = `<canvas aria-label="Jouw foto"></canvas>
-    <div class="game-side">${bins({ marks })}<p class="fine">Niemand weet hier het juiste antwoord. Klopt het? Dat beoordeel jij.</p></div>`;
-  drawCanvas(box.querySelector('canvas'), state.source.base);
+  box.innerHTML = `<canvas aria-label="${t('ownAria')}"></canvas>
+    <div class="game-side">${bins({ marks })}<p class="fine">${t('ownNote')}</p></div>`;
+  drawCanvas(box.querySelector('canvas'), state.own.canvas);
 }
 
 // ---------- gekozen foto: gedeeld door hoofdstuk 2 en 5 ----------
 
 function buildStrips() {
   for (const holder of document.querySelectorAll('[data-thumbs]')) {
+    holder.innerHTML = '';
     for (const ex of state.data.examples) {
-      const b = el('button', { type: 'button', 'aria-pressed': 'false', 'data-file': ex.file, 'data-tip': `${cap(cls(ex.label))}${ex.note ? `: ${ex.note.toLowerCase()}` : ''}`, 'aria-label': cap(cls(ex.label)) },
+      const pressed = String(state.source?.example === ex);
+      const b = el('button', { type: 'button', 'aria-pressed': pressed, 'data-file': ex.file, 'data-tip': `${cap(cls(ex.label))}${ex.note ? `: ${noteOf(ex).toLowerCase()}` : ''}`, 'aria-label': cap(cls(ex.label)) },
         `<img src="${exampleUrl(ex)}" alt="" loading="lazy">`);
       b.addEventListener('click', () => selectExample(ex));
       holder.append(b);
@@ -448,8 +470,12 @@ async function setSource({ img, name, label, example }) {
   drawCanvas($('#stage-photo'), base);
   renderPixels(state.base.crops.cnn);
   renderFeatureMaps(state.base.tensors.cnn);
-  $('#stage-verdict').innerHTML = state.base.probs.cnn ? vbars(state.base.probs.cnn) : '<p class="fine">Modellen niet geladen.</p>';
+  renderStageVerdict();
   updateTest();
+}
+
+function renderStageVerdict() {
+  $('#stage-verdict').innerHTML = state.base.probs.cnn ? vbars(state.base.probs.cnn) : `<p class="fine">${t('modelsNotLoaded')}</p>`;
 }
 
 // ---------- 2 machine ----------
@@ -464,10 +490,11 @@ function rgbToImageData(rgb, size) {
 
 // Kanaalkleuren zijn functioneel: ze laten zien welk getal bij welke kleur hoort
 const CHANNELS = [
-  { name: 'rood', short: 'R', color: '#e03131' },
-  { name: 'groen', short: 'G', color: '#2f9e44' },
-  { name: 'blauw', short: 'B', color: '#1c7ed6' },
+  { short: 'R', color: '#e03131' },
+  { short: 'G', color: '#2f9e44' },
+  { short: 'B', color: '#1c7ed6' },
 ];
+CHANNELS.forEach((ch, c) => Object.defineProperty(ch, 'name', { get: () => t('channels')[c] }));
 
 function renderPixels(crop) {
   const size = state.data.image_size.cnn;
@@ -499,9 +526,9 @@ function showPixel(px, py) {
   marker.style.top = `${(py / size) * 100}%`;
   marker.style.width = marker.style.height = `${100 / size}%`;
 
-  $('#pixel-pos').innerHTML = `Pixel <b>x ${px}, y ${py}</b>`;
+  $('#pixel-pos').innerHTML = t('pixelPos', px, py);
   $('#pixel-channels').innerHTML = `
-    <div class="ch ch-head"><span>kanaal</span><span>0 – 255</span><span></span><span>model krijgt</span></div>
+    <div class="ch ch-head"><span>${t('chHead')}</span><span>0 – 255</span><span></span><span>${t('modelGets')}</span></div>
     ${CHANNELS.map((ch, c) => `
       <div class="ch">
         <span class="ch-name"><i style="background:${ch.color}"></i>${ch.name}</span>
@@ -531,7 +558,7 @@ function renderFeatureMaps(tensor) {
   const grid = $('#feature-maps');
   if (!grid.children.length) {
     for (let o = 0; o < O; o++) {
-      const b = el('button', { type: 'button', class: 'fmap', 'aria-pressed': 'false', 'aria-label': `Filter ${o + 1}` },
+      const b = el('button', { type: 'button', class: 'fmap', 'aria-pressed': 'false', 'aria-label': t('filterAria', o + 1) },
         `<canvas width="${size}" height="${size}"></canvas><span>#${String(o + 1).padStart(2, '0')}</span>`);
       b.addEventListener('click', () => selectFilter(o));
       grid.append(b);
@@ -593,10 +620,11 @@ function selectFilter(o) {
       <div class="kernel-grid">${Array.from({ length: K * K }, (_, j) => {
         const v = w(i, Math.floor(j / K), j % K);
         const a = (Math.abs(v) / maxAbs) * 0.85;
-        // + = donker vlak (hoe sterker, hoe donkerder), − = gestippelde rand
+        // + = gevuld vlak in de tekstkleur (hoe sterker, hoe voller), − = gestippelde rand; volgt het thema
+        const mix = (share) => `color-mix(in srgb, var(--ink) ${(share * 100).toFixed(0)}%, transparent)`;
         const style = v >= 0
-          ? `background:rgba(13,13,13,${a.toFixed(2)});color:${a > 0.45 ? '#ffffff' : 'var(--ink)'}`
-          : `border:1px dashed rgba(13,13,13,${(0.25 + a * 0.75).toFixed(2)});color:var(--ink-2)`;
+          ? `background:${mix(a)};color:${a > 0.45 ? 'var(--bg)' : 'var(--ink)'}`
+          : `border:1px dashed ${mix(0.25 + a * 0.75)};color:var(--ink-2)`;
         return `<span style="${style}">${v >= 0 ? '+' : '−'}${fmtNum(Math.abs(v), 2)}</span>`;
       }).join('')}</div>
     </div>`).join('');
@@ -604,9 +632,9 @@ function selectFilter(o) {
   const detail = $('#filter-detail');
   detail.innerHTML = `
     <p class="filter-title">Filter #${String(o + 1).padStart(2, '0')}</p>
-    <canvas width="${size}" height="${size}" class="pixelated filter-big" aria-label="Kaart van filter ${o + 1}"></canvas>
-    <p class="fine">Reageert op <b>${fmtPct(map.active)}</b> van de pixels van deze foto${map.active === 0 ? ': dit patroon zit er niet in' : ''}.</p>
-    <p class="fine">Het patroon: 3 × 3 gewichten per kleur. <b>+</b> donker vlak = die kleur op die plek maakt het filter sterker, <b>−</b> gestippeld = zwakker.</p>
+    <canvas width="${size}" height="${size}" class="pixelated filter-big" aria-label="${t('filterMapAria', o + 1)}"></canvas>
+    <p class="fine">${t('reacts', fmtPct(map.active), map.active === 0)}</p>
+    <p class="fine">${t('pattern')}</p>
     <div class="kernels">${kernels}</div>`;
   detail.querySelector('canvas').getContext('2d').putImageData(map.img, 0, 0);
 }
@@ -623,9 +651,10 @@ function renderBinFill() {
   const dpr = window.devicePixelRatio || 1;
   const holder = $('#bin-fill');
   holder.innerHTML = '';
-  classes.forEach((c, k) => {
+  classes.forEach((_, k) => {
+    const c = cls(k);
     // el() zet attributen met setAttribute: niet escapen, anders staat <b> letterlijk in de tooltip
-    const col = el('div', { class: 'fill-col', 'data-tip': `<b>${cap(c)}</b><br>${fmtNum(counts[k])} foto's` });
+    const col = el('div', { class: 'fill-col', 'data-tip': t('fillTip', cap(c), fmtNum(counts[k])) });
     const W = COLS * (S + GAP) - GAP;
     const H = maxRows * (S + GAP) - GAP;
     const canvas = canvasOf(W * dpr, H * dpr);
@@ -649,9 +678,9 @@ function renderBinFill() {
   const [tr, va, te] = ['train', 'val', 'test'].map((s) => sum(sc[s]));
   const all = tr + va + te;
   $('#split').innerHTML = `
-    <div class="s-train" style="flex:${tr / all}" data-tip="Hiervan leert het model">${fmtNum(tr)} leren</div>
-    <div class="s-val" style="flex:${va / all}" data-tip="Hiermee kozen we de beste trainingsronde">${fmtNum(va)} kiezen</div>
-    <div class="s-test" style="flex:${te / all}" data-tip="De eindtoets: één keer gebruikt, aan het eind">${fmtNum(te)} toetsen</div>`;
+    <div class="s-train" style="flex:${tr / all}" data-tip="${t('splitLearnTip')}">${t('splitLearn', fmtNum(tr))}</div>
+    <div class="s-val" style="flex:${va / all}" data-tip="${t('splitChooseTip')}">${t('splitChoose', fmtNum(va))}</div>
+    <div class="s-test" style="flex:${te / all}" data-tip="${t('splitTestTip')}">${t('splitTest', fmtNum(te))}</div>`;
 }
 
 function renderCurves() {
@@ -683,10 +712,10 @@ function renderCurves() {
   }).join('');
 
   const xTicks = [...new Set(niceTicks(n, 5).map((t) => Math.max(1, t)))];
-  container.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="Leercurves op de validatiefoto's">
+  container.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${t('curvesAria')}">
     ${yTicks.map((t) => `<line class="grid-line" x1="${m.left}" x2="${m.left + iw}" y1="${y(t)}" y2="${y(t)}"/><text class="axis-text" x="${m.left - 8}" y="${y(t) + 4}" text-anchor="end">${fmtY(t)}</text>`).join('')}
     ${xTicks.map((t) => `<text class="axis-text" x="${x(t)}" y="${H - 8}" text-anchor="middle">${t}</text>`).join('')}
-    <text class="axis-text" x="${m.left + iw}" y="${H - 8}" dx="40">ronde</text>
+    <text class="axis-text" x="${m.left + iw}" y="${H - 8}" dx="40">${t('roundAxis')}</text>
     ${parts}
     <line class="crosshair" id="curve-cross" x1="0" x2="0" y1="${m.top}" y2="${m.top + ih}" visibility="hidden"/>
     <rect data-crosshair x="${m.left}" y="${m.top}" width="${iw}" height="${ih}" fill="transparent"/>
@@ -703,9 +732,9 @@ function renderCurves() {
     cross.setAttribute('visibility', 'visible');
     const rows = MODELS.map((mod) => {
       const ep = state.history[mod.id].history[epoch - 1];
-      return ep ? `${esc(mod.name)}: ${fmtY(ep.val[metric])} <span style="opacity:.7">(train ${fmtY(ep.train[metric])})</span>` : `${esc(mod.name)}: klaar na ${state.history[mod.id].epochs} rondes`;
+      return ep ? `${esc(mod.name)}: ${fmtY(ep.val[metric])} <span style="opacity:.7">(train ${fmtY(ep.train[metric])})</span>` : `${esc(mod.name)}: ${t('doneAfter', state.history[mod.id].epochs)}`;
     });
-    showTip(`<b>Ronde ${epoch}</b><br>${rows.join('<br>')}`, e.clientX, e.clientY);
+    showTip(`<b>${t('roundTip', epoch)}</b><br>${rows.join('<br>')}`, e.clientX, e.clientY);
   });
   overlay.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); hideTip(); });
 }
@@ -719,11 +748,12 @@ function renderExam() {
   $('#exam').innerHTML = MODELS.map((mod) => {
     const e = state.evaluation[mod.id];
     const rows = state.data.classes.map((c, k) => {
+      const name = cap(cls(k));
       const correct = e.confusion_matrix[k][k];
       const total = sum(e.confusion_matrix[k]);
       const wrong = e.mistakes.filter((x) => x.true === c).sort((a, b) => a.confidence - b.confidence);
-      const squares = Array.from({ length: correct }, () => `<i class="sq" style="--c:${binColor(k)}" data-tip="${esc(`<b>${cap(c)}</b>: goed`)}"></i>`).join('')
-        + wrong.map((x) => `<i class="sq wrong${x.confidence >= SURE ? ' sure' : ''}" style="--c:${binColor(k)}" data-tip="${esc(`<b>${cap(x.true)}</b>, model zei <b>${x.predicted}</b><br>${fmtPct(x.confidence)} zeker · ${x.file.split('/')[1]}`)}"></i>`).join('');
+      const squares = Array.from({ length: correct }, () => `<i class="sq" style="--c:${binColor(k)}" data-tip="${esc(t('sqOk', name))}"></i>`).join('')
+        + wrong.map((x) => `<i class="sq wrong${x.confidence >= SURE ? ' sure' : ''}" style="--c:${binColor(k)}" data-tip="${esc(t('sqWrong', name, clsOf(x.predicted), fmtPct(x.confidence), x.file.split('/')[1]))}"></i>`).join('');
       return `<div class="exam-row">
         <span class="exam-cls">${binChip(k)}</span>
         <div class="squares">${squares}</div>
@@ -733,7 +763,7 @@ function renderExam() {
     return `<div class="exam-model">
       <p class="exam-name ${mod.id}"><i></i>${esc(mod.name)}</p>
       <p class="exam-num">${fmtPct(e.accuracy, 1)}</p>
-      <p class="exam-sub">${e.mistakes.length} fout van ${e.n_test} · ${e.confident_mistakes} daarvan minstens 80% zeker</p>
+      <p class="exam-sub">${t('examSub', e.mistakes.length, e.n_test, e.confident_mistakes)}</p>
       <div class="exam-rows">${rows}</div>
     </div>`;
   }).join('');
@@ -741,13 +771,13 @@ function renderExam() {
 
 // Recall per soort, beide modellen naast elkaar: dicht = eigen CNN, gearceerd = MobileNet
 function renderClassBars() {
-  $('#class-legend').innerHTML = `<span class="key"><i class="cb-key cnn"></i>Eigen CNN</span><span class="key"><i class="cb-key mobilenet"></i>MobileNet</span>`;
+  $('#class-legend').innerHTML = `<span class="key"><i class="cb-key cnn"></i>${t('ownCnn')}</span><span class="key"><i class="cb-key mobilenet"></i>MobileNet</span>`;
   $('#class-bars').innerHTML = state.data.classes.map((_, k) => `
     <div class="cb-row">
       <span class="cb-name">${binChip(k)}</span>
       <div class="cb-bars">${MODELS.map((m) => {
         const r = state.evaluation[m.id].per_class[k].recall;
-        return `<div class="cb-bar ${m.id}" data-tip="${esc(`<b>${m.name}</b>: ${fmtPct(r)} van de ${cls(k)}-foto's goed`)}">
+        return `<div class="cb-bar ${m.id}" data-tip="${esc(t('cbTip', m.name, fmtPct(r), cls(k)))}">
           <span class="cb-track"><i style="width:${(r * 100).toFixed(1)}%"></i></span><b class="mono">${fmtPct(r)}</b></div>`;
       }).join('')}</div>
     </div>`).join('');
@@ -765,21 +795,21 @@ function renderMixups() {
       ${pairs.slice(0, 4).map(({ i, j, v, n }) => `
         <div class="mix-row">
           <b class="mix-count">${v}×</b>
-          <p class="mix-text">${binChip(i)} <span class="mix-arrow">aangezien voor</span> ${binChip(j)}</p>
+          <p class="mix-text">${binChip(i)} <span class="mix-arrow">${t('mixArrow')}</span> ${binChip(j)}</p>
           <span class="mix-bar"><i style="width:${((v / n) * 100).toFixed(1)}%"></i></span>
-          <span class="mix-share fine">${v} van de ${n} ${esc(cls(i))}-foto's (${fmtPct(v / n)})</span>
+          <span class="mix-share fine">${t('mixShare', v, n, esc(cls(i)), fmtPct(v / n))}</span>
         </div>`).join('')}
     </div>`;
   }).join('');
 }
 
 function renderClassTable() {
-  const rows = state.data.classes.map((c, i) => {
+  const rows = state.data.classes.map((_, i) => {
     const [a, b] = MODELS.map((m) => state.evaluation[m.id].per_class[i]);
-    return [cap(c), fmtNum(a.support), fmtNum(a.precision, 2), fmtNum(a.recall, 2), fmtNum(a.f1, 2), fmtNum(b.precision, 2), fmtNum(b.recall, 2), fmtNum(b.f1, 2)];
+    return [cap(cls(i)), fmtNum(a.support), fmtNum(a.precision, 2), fmtNum(a.recall, 2), fmtNum(a.f1, 2), fmtNum(b.precision, 2), fmtNum(b.recall, 2), fmtNum(b.f1, 2)];
   });
-  $('#table-classes').innerHTML = table(['Soort', 'Testfoto\'s', 'CNN precisie', 'CNN recall', 'CNN F1', 'MobileNet precisie', 'MobileNet recall', 'MobileNet F1'], rows)
-    + '<p class="fine" style="margin-top:8px">Precisie: als het model "glas" zegt, hoe vaak klopt dat? Recall: van alle glazen voorwerpen, hoeveel vond het?</p>';
+  $('#table-classes').innerHTML = table(t('tableHead'), rows)
+    + `<p class="fine" style="margin-top:8px">${esc(t('tableNote'))}</p>`;
 }
 
 // ---------- 5 lab ----------
@@ -788,7 +818,7 @@ function buildSliders() {
   const holder = $('#sliders');
   for (const s of SLIDERS) {
     const wrap = el('div', { class: 'slider' });
-    wrap.innerHTML = `<label for="s-${s.id}"><span>${esc(s.label)}</span><span id="v-${s.id}">${esc(s.format(s.neutral))}</span></label>
+    wrap.innerHTML = `<label for="s-${s.id}"><span id="l-${s.id}">${esc(s.label)}</span><span id="v-${s.id}">${esc(s.format(s.neutral))}</span></label>
       <input type="range" id="s-${s.id}" min="${s.min}" max="${s.max}" step="${s.step}" value="${s.neutral}" disabled>`;
     holder.append(wrap);
     const input = wrap.querySelector('input');
@@ -861,14 +891,14 @@ function applyVariations(base, p) {
 function renderVerdicts(result, label) {
   const holder = $('#test-verdicts');
   if (!Object.keys(result.probs).length) {
-    holder.innerHTML = '<div class="verdict"><p>Zonder geladen modellen kan deze foto niet beoordeeld worden.</p></div>';
+    holder.innerHTML = `<div class="verdict"><p>${t('verdictNoModels')}</p></div>`;
     return;
   }
   holder.innerHTML = MODELS.map((m) => {
     const p = result.probs[m.id];
     const k = argmax(p);
     let badge = '';
-    if (label !== null && label !== undefined) badge = k === label ? '<span class="badge good">✓ klopt</span>' : '<span class="badge bad">✗ fout</span>';
+    if (label !== null && label !== undefined) badge = k === label ? `<span class="badge good">${t('badgeOk')}</span>` : `<span class="badge bad">${t('badgeWrong')}</span>`;
     return `<div class="verdict">
       <div class="verdict-head ${m.id}"><i></i>${esc(m.name)}${badge}</div>
       <div class="verdict-label" style="--c:${binColor(k)}"><span class="swatch"></span>${esc(cap(cls(k)))} <span class="verdict-pct">${fmtPct(p[k])}</span></div>
@@ -906,7 +936,7 @@ function renderVariations() {
   // Eerst alle panelen plaatsen, dan meten: met auto-fit krijgt een eenzaam paneel de volle breedte
   const holders = exps.map((exp) => {
     const block = el('div');
-    block.append(el('h4', {}, esc(cap(exp.name))));
+    block.append(el('h4', {}, esc(cap(t('exp')[exp.name]))));
     const holder = el('div');
     block.append(holder);
     container.append(block);
@@ -924,19 +954,19 @@ function renderVariations() {
     const y = (v) => m.top + ih - v * ih;
     const neutralIdx = exp.results.findIndex((r) => r.level === exp.neutral);
     const fmtLevel = (v) => fmtNum(v, Number.isInteger(v) ? 0 : 2);
-    holder.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(exp.name)}">
+    holder.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(t('exp')[exp.name])}">
       ${[0, 0.5, 1].map((t) => `<line class="grid-line" x1="${m.left}" x2="${W - m.right}" y1="${y(t)}" y2="${y(t)}"/><text class="axis-text" x="${m.left - 6}" y="${y(t) + 4}" text-anchor="end">${fmtPct(t)}</text>`).join('')}
       <line class="crosshair" x1="${x(neutralIdx)}" x2="${x(neutralIdx)}" y1="${m.top}" y2="${m.top + ih}" stroke-dasharray="3 3"/>
       ${exp.results.map((r, i) => `<text class="axis-text" x="${x(i)}" y="${H - 6}" text-anchor="middle"${i === neutralIdx ? ' style="font-weight:700;fill:var(--ink)"' : ''}>${fmtLevel(r.level)}</text>`).join('')}
       ${MODELS.map((mod) => linePath(mod.id, exp.results.map((r, i) => `${i ? 'L' : 'M'}${x(i)},${y(r.accuracy[mod.id])}`).join(''))).join('')}
       ${MODELS.map((mod) => exp.results.map((r, i) => marker(mod.id, x(i), y(r.accuracy[mod.id]), 4)).join('')).join('')}
-      ${exp.results.map((r, i) => `<rect x="${x(i) - iw / (n - 1) / 2}" y="${m.top}" width="${iw / (n - 1)}" height="${ih}" fill="transparent" data-tip="${esc(`<b>${cap(exp.name)}: ${fmtLevel(r.level)} ${exp.unit}</b>${i === neutralIdx ? ' (origineel)' : ''}<br>${MODELS.map((mod) => `${mod.name} ${fmtPct(r.accuracy[mod.id], 1)}`).join('<br>')}`)}"/>`).join('')}
+      ${exp.results.map((r, i) => `<rect x="${x(i) - iw / (n - 1) / 2}" y="${m.top}" width="${iw / (n - 1)}" height="${ih}" fill="transparent" data-tip="${esc(`<b>${cap(t('exp')[exp.name])}: ${fmtLevel(r.level)} ${t('unit')[exp.unit]}</b>${i === neutralIdx ? t('original') : ''}<br>${MODELS.map((mod) => `${mod.name} ${fmtPct(r.accuracy[mod.id], 1)}`).join('<br>')}`)}"/>`).join('')}
     </svg>`;
   }
   const get = (name, level) => exps.find((e) => e.name === name).results.find((r) => r.level === level).accuracy;
   const base = get('licht', 1);
   const dark = get('licht', 0.5);
-  $('#var-note').textContent = `De verticale stippellijn is de originele foto. Voorbeeld: op half licht zakt het eigen CNN van ${fmtPct(base.cnn, 1)} naar ${fmtPct(dark.cnn, 1)} goed, MobileNet blijft op ${fmtPct(dark.mobilenet, 1)}. Ondersteboven gaat beter dan schuin: bij het trainen werden foto's gespiegeld, en twee keer spiegelen is 180° draaien.`;
+  $('#var-note').textContent = t('varNote', fmtPct(base.cnn, 1), fmtPct(dark.cnn, 1), fmtPct(dark.mobilenet, 1));
 }
 
 // ---------- 6 zeker ≠ juist ----------
@@ -947,13 +977,14 @@ function renderMoment() {
   const worst = c.mistakes[0];
   const ex = state.data.examples.find((e) => e.source === worst.file);
   if (ex) $('#moment-img').src = exampleUrl(ex);
+  $('#moment-img').alt = ex ? noteOf(ex) : t('momentAlt');
   const share = (e) => e.confident_mistakes / e.mistakes.length;
   const k = (name) => state.data.classes.indexOf(name);
   $('#moment-stats').innerHTML = `
-    <div><dt>zekerheid</dt><dd class="moment-pct">${fmtPct(worst.confidence)}</dd></div>
-    <div><dt>eigen CNN zei</dt><dd>${binChip(k(worst.predicted))}</dd></div>
-    <div><dt>het was</dt><dd>${binChip(k(worst.true))}</dd></div>`;
-  $('#moment-text').textContent = `${ex?.note ? `${ex.note}. ` : ''}Van alle fouten van het eigen CNN was ${fmtPct(share(c))} minstens 80% zeker. Bij MobileNet, het betere model: ${fmtPct(share(mb))}. Een fout antwoord ziet er net zo stellig uit als een goed.`;
+    <div><dt>${t('dtSure')}</dt><dd class="moment-pct">${fmtPct(worst.confidence)}</dd></div>
+    <div><dt>${t('dtSaid')}</dt><dd>${binChip(k(worst.predicted))}</dd></div>
+    <div><dt>${t('dtWas')}</dt><dd>${binChip(k(worst.true))}</dd></div>`;
+  $('#moment-text').textContent = t('momentText', ex?.note ? noteOf(ex) : '', fmtPct(share(c)), fmtPct(share(mb)));
 
   const holder = $('#hard');
   holder.innerHTML = '';
@@ -963,10 +994,10 @@ function renderMoment() {
       const k = argmax(p);
       // Groene stip = goed, rode stip = fout; de tekst erachter is voor schermlezers
       const ok = k === ex2.label;
-      return `<span class="row ${ok ? 'ok' : 'no'}"><i aria-hidden="true"></i><span class="sr">${ok ? 'goed' : 'fout'}: </span>${esc(m.short)}: ${esc(cls(k))} ${fmtPct(p[k])}</span>`;
+      return `<span class="row ${ok ? 'ok' : 'no'}"><i aria-hidden="true"></i><span class="sr">${ok ? t('srOk') : t('srWrong')}: </span>${esc(m.short)}: ${esc(cls(k))} ${fmtPct(p[k])}</span>`;
     }).join('');
-    const card = el('button', { type: 'button', class: 'hard-card', 'data-tip': 'Open in het lab' },
-      `<img src="${exampleUrl(ex2)}" alt="" loading="lazy"><div><b>${esc(ex2.note)}</b><span>Echt: ${esc(cls(ex2.label))}</span>${rows}</div>`);
+    const card = el('button', { type: 'button', class: 'hard-card', 'data-tip': t('openLab') },
+      `<img src="${exampleUrl(ex2)}" alt="" loading="lazy"><div><b>${esc(noteOf(ex2))}</b><span>${esc(t('actually', cls(ex2.label)))}</span>${rows}</div>`);
     card.addEventListener('click', async () => {
       await selectExample(ex2);
       $('#lab').scrollIntoView();
@@ -984,25 +1015,25 @@ function renderRai() {
   const exps = state.variations.experiments;
   const get = (name, level) => exps.find((e) => e.name === name).results.find((r) => r.level === level).accuracy.cnn;
   const rows = [
-    { label: 'Wit papier (zoals getraind)', v: get('licht', 1), base: true },
-    { label: 'Donkere tafel, foto 75%', v: get('kleiner op donker', 0.75) },
-    { label: 'Half zoveel licht', v: get('licht', 0.5) },
+    { label: t('raiRowWhite'), v: get('licht', 1), base: true },
+    { label: t('raiRowDark'), v: get('kleiner op donker', 0.75) },
+    { label: t('raiRowHalf'), v: get('licht', 0.5) },
   ];
-  $('#rai-bias-bars').innerHTML = `<p class="rai-bars-title">Eigen CNN, % goed op 380 testfoto's</p>${rows.map((r) => `
+  $('#rai-bias-bars').innerHTML = `<p class="rai-bars-title">${t('raiBarsTitle')}</p>${rows.map((r) => `
     <div class="rai-bar${r.base ? ' base' : ''}"><span>${esc(r.label)}</span><b>${fmtPct(r.v, 1)}</b>
       <i style="width:${(r.v * 100).toFixed(1)}%"></i></div>`).join('')}`;
-  $('#rai-bias').textContent = `Elke trainingsfoto: wit papier, één schoon voorwerp. Daarbuiten zakt het eigen CNN fors. En restafval had maar ${fmtNum(f.trash)} foto's, tegen ${fmtNum(f.paper + f.cardboard)} van papier en karton.`;
-  $('#rai-bias-did').textContent = 'Daarom telden fouten op kleine soorten zwaarder bij het trainen, staan de scores per soort, en laat het lab zien wat er buiten wit papier gebeurt.';
+  $('#rai-bias').textContent = t('raiBias', fmtNum(f.trash), fmtNum(f.paper + f.cardboard));
+  $('#rai-bias-did').textContent = t('raiBiasDid');
 
   const share = (e) => e.confident_mistakes / e.mistakes.length;
   $('#rai-trust-big').textContent = fmtPct(share(mob));
-  $('#rai-trust').textContent = `van de fouten van MobileNet was minstens 80% zeker; bij het eigen CNN ${fmtPct(share(c))}. Een fout antwoord ziet er even stellig uit als een goed.`;
+  $('#rai-trust').textContent = t('raiTrust', fmtPct(share(c)));
 
   const min = (id) => fmtNum(state.history[id].seconds / 60, 1);
   const mb = (id) => fmtNum(state.onnx.find((o) => o.model === id).onnx_bytes / 1e6, 1);
   $('#rai-green-big').textContent = `${min('cnn')} min`;
-  $('#rai-green').textContent = `training van het eigen CNN op één videokaart. MobileNet trainde hier ${min('mobilenet')} min (${mb('mobilenet')} MB), maar leunt op een eerdere training met 1,2 miljoen foto's die je hier niet ziet.`;
-  $('#rai-green-did').textContent = `Daarom een klein model (${mb('cnn')} MB) dat op jouw apparaat voorspelt, zonder datacenter. En niet langer trainen dan nuttig: MobileNet bleef op 15 rondes, omdat 30 rondes niets beters opleverde.`;
+  $('#rai-green').textContent = t('raiGreen', min('mobilenet'), mb('mobilenet'));
+  $('#rai-green-did').textContent = t('raiGreenDid', mb('cnn'));
 }
 
 // ---------- 8 vragen ----------
@@ -1036,7 +1067,6 @@ function syntheticCanvas({ w, h }) {
 const maxAbsDiff = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
 
 async function runParityCheck() {
-  const node = $('#parity');
   // 1. Exact dezelfde pixels: test model en voorbewerking
   const syn = await predict(syntheticCanvas(state.data.synthetic), null);
   const exactPer = Object.fromEntries(MODELS.map((m) => [m.id, maxAbsDiff(syn.probs[m.id], state.data.synthetic.probabilities[m.id])]));
@@ -1055,9 +1085,21 @@ async function runParityCheck() {
   }
   // Float32-afronding verschilt per rekenbibliotheek; 0,1 procentpunt is ruim daarboven
   const ok = same === total && exactDiff < 1e-3;
-  node.dataset.state = ok ? 'ok' : 'warn';
-  node.innerHTML = `${ok ? 'Ja, vrijwel.' : 'Niet helemaal.'} Op precies dezelfde pixels is het grootste verschil ${fmtNum(exactPer.cnn * 100, 4)} procentpunt (eigen CNN) en ${fmtNum(exactPer.mobilenet * 100, 4)} (MobileNet): afronding van kommagetallen. Het verkleinen en uitsnijden gaat tot op de pixel gelijk, en dat wordt automatisch getest. Op de ${state.data.examples.length} voorbeeldfoto's is het antwoord ${same} van de ${total} keer hetzelfde, en de zekerheid verschilt tot ${fmtNum(maxDiff * 100, 1)} procentpunt. Dat komt doordat browsers een JPEG net iets anders kunnen openen dan Python; in onze test scheelden pixels 1 of 2 op 255. Onzichtbaar voor jou, merkbaar voor het model.`;
+  state.parity = { ok, exactPer, same, total, maxDiff };
+  renderParity();
   document.body.dataset.parity = JSON.stringify({ exactPer, same, total, maxDiff });
+}
+
+function renderParity() {
+  const node = $('#parity');
+  const p = state.parity;
+  if (!p) {
+    node.textContent = state.status === 'fallback' ? t('parityNotChecked') : t('parityPending');
+    return;
+  }
+  node.dataset.state = p.ok ? 'ok' : 'warn';
+  node.textContent = t('parity', p.ok, fmtNum(p.exactPer.cnn * 100, 4), fmtNum(p.exactPer.mobilenet * 100, 4),
+    state.data.examples.length, p.same, p.total, fmtNum(p.maxDiff * 100, 1));
 }
 
 // ---------- IDE: actieve tab volgt het scrollen ----------
@@ -1075,10 +1117,104 @@ function setupIde() {
   for (const id of tabs.keys()) observer.observe(document.getElementById(id));
 }
 
+// ---------- taal en thema ----------
+
+function renderCurveMetric() {
+  segmented($('#curve-metric'), [{ id: 'accuracy', label: t('metricRight') }, { id: 'loss', label: t('metricLoss') }], state.curveMetric, (id) => { state.curveMetric = id; renderCurves(); });
+}
+
+// De Nederlandse tekst staat in index.html; bewaar die voordat er iets vertaald wordt
+const NL_HTML = new Map([...document.querySelectorAll('[data-i18n]')].map((n) => [n, n.innerHTML]));
+const NL_ATTR = [...document.querySelectorAll('[data-i18n-attr]')].map((n) => {
+  const [attr, key] = n.dataset.i18nAttr.split(':');
+  return { n, attr, key, nl: n.getAttribute(attr) };
+});
+
+function applyLang() {
+  const en = state.lang === 'en';
+  for (const [n, nl] of NL_HTML) n.innerHTML = en ? HTML_EN[n.dataset.i18n] : nl;
+  for (const { n, attr, key, nl } of NL_ATTR) n.setAttribute(attr, en ? ATTR_EN[key] : nl);
+  document.documentElement.lang = state.lang;
+  document.title = t('docTitle');
+  document.querySelector('meta[name="description"]').content = t('docDesc');
+  const btn = $('#lang-toggle');
+  btn.setAttribute('aria-label', t('langLabel'));
+  for (const opt of btn.querySelectorAll('[data-lang]')) opt.classList.toggle('on', opt.dataset.lang === state.lang);
+  updateThemeButton();
+  setStatus(state.status);
+}
+
+function setLang(lang) {
+  state.lang = lang;
+  try { localStorage.setItem('lang', lang); } catch { /* alleen voor deze sessie */ }
+  const url = new URL(location.href);
+  url.searchParams.delete('lang');
+  history.replaceState(null, '', url);
+  hideTip();
+  applyLang();
+  if (!state.data) return;
+  // Alles opnieuw tekenen; spelstand, gekozen foto en schuifjes blijven staan
+  renderHero();
+  renderGame();
+  renderOwnResult();
+  if (state.uploadError) showUploadError(state.uploadError);
+  buildStrips();
+  renderBinFill();
+  renderCurveMetric();
+  renderCurves();
+  renderExam();
+  renderClassBars();
+  renderMixups();
+  renderClassTable();
+  for (const s of SLIDERS) {
+    $(`#l-${s.id}`).textContent = s.label;
+    $(`#v-${s.id}`).textContent = s.format(state.params[s.id]);
+  }
+  renderVariations();
+  renderMoment();
+  renderRai();
+  renderFaq();
+  renderParity();
+  if (state.base) {
+    showPixel(...state.pixel);
+    for (const [o, b] of [...$('#feature-maps').children].entries()) b.setAttribute('aria-label', t('filterAria', o + 1));
+    selectFilter(state.filter);
+    renderStageVerdict();
+    updateTest();
+  }
+}
+
+function updateThemeButton() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  const btn = $('#theme-toggle');
+  btn.setAttribute('aria-pressed', String(dark));
+  btn.setAttribute('aria-label', t('theme'));
+  btn.title = t('theme');
+}
+
+function setupToggles() {
+  // ?lang=en opent direct in het Engels; anders de vorige keuze, anders Nederlands
+  let saved = null;
+  try { saved = localStorage.getItem('lang'); } catch { /* geen opslag */ }
+  const asked = new URLSearchParams(location.search).get('lang');
+  state.lang = STRINGS[asked] ? asked : STRINGS[saved] ? saved : 'nl';
+  $('#lang-toggle').addEventListener('click', () => setLang(state.lang === 'nl' ? 'en' : 'nl'));
+
+  // Het thema staat al op <html> (inline script in index.html, vóór het tekenen)
+  $('#theme-toggle').addEventListener('click', () => {
+    const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem('theme', theme); } catch { /* alleen voor deze sessie */ }
+    document.querySelector('meta[name="theme-color"]').content = cssVar('--bg');
+    updateThemeButton();
+  });
+  updateThemeButton();
+}
+
 // ---------- start ----------
 
 async function loadModels() {
-  setStatus('loading', 'modellen laden…');
+  setStatus('loading');
   try {
     if (!window.ort) throw new Error('ONNX Runtime Web niet geladen');
     ort.env.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
@@ -1087,12 +1223,12 @@ async function loadModels() {
     state.sessions = Object.fromEntries(MODELS.map((m, i) => [m.id, sessions[i]]));
   } catch (err) {
     console.error(err);
-    setStatus('fallback', 'offline: vooraf berekend');
-    $('#parity').textContent = 'Niet gecontroleerd: de modellen zijn niet geladen.';
+    setStatus('fallback');
+    renderParity();
     setLive(false);
     return;
   }
-  setStatus('ready', 'modellen geladen');
+  setStatus('ready');
   setLive(true);
   if (state.source?.example) await selectExample(state.source.example);
   runParityCheck();
@@ -1110,6 +1246,8 @@ window.addEventListener('resize', () => {
 
 async function init() {
   setupIde();
+  setupToggles();
+  if (state.lang !== 'nl') applyLang();
   try {
     const [data, hc, hm, ec, em, variations, onnx] = await Promise.all([
       loadJSON('explainer/data/web.json'),
@@ -1123,7 +1261,7 @@ async function init() {
     Object.assign(state, { data, variations, onnx, history: { cnn: hc, mobilenet: hm }, evaluation: { cnn: ec, mobilenet: em } });
   } catch (err) {
     console.error(err);
-    setStatus('error', 'open via een webserver');
+    setStatus('error');
     return;
   }
 
@@ -1132,7 +1270,7 @@ async function init() {
   setupUpload();
   buildStrips();
   renderBinFill();
-  segmented($('#curve-metric'), [{ id: 'accuracy', label: 'Goed' }, { id: 'loss', label: 'Fout-score (loss)' }], state.curveMetric, (id) => { state.curveMetric = id; renderCurves(); });
+  renderCurveMetric();
   renderCurves();
   renderExam();
   renderClassBars();
@@ -1147,7 +1285,7 @@ async function init() {
   $('#pixel-canvas').addEventListener('pointermove', pixelHover);
   $('#pixel-canvas').addEventListener('pointerdown', pixelHover); // ook tikken op een telefoon
 
-  const first = state.data.examples.find((e) => !e.note && cls(e.label) === 'glas') || state.data.examples[0];
+  const first = state.data.examples.find((e) => !e.note && state.data.classes[e.label] === 'glas') || state.data.examples[0];
   await selectExample(first);
   loadModels();
 }
