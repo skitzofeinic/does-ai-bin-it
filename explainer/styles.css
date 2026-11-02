@@ -491,6 +491,11 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
 .colofon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: clamp(24px, 4vw, 64px); align-items: start; }
 .colofon-text { display: grid; gap: clamp(1.2rem, 2.4vw, 2rem); justify-items: start; }
 .story { font-size: clamp(1rem, 0.9rem + 0.4vw, 1.2rem); line-height: 1.75; color: var(--ink-2); }
+.how { display: grid; gap: 12px; counter-reset: how; width: 100%; }
+.how li { display: grid; grid-template-columns: 2.4em 9em minmax(0, 1fr); gap: 4px 14px; align-items: baseline; padding-bottom: 12px; border-bottom: 1px dashed var(--hair); }
+.how li::before { counter-increment: how; content: counter(how, decimal-leading-zero); color: var(--accent); font-weight: 700; }
+.how b { color: var(--ink); }
+.how span { color: var(--ink-2); }
 .story-end { font-weight: 700; text-underline-offset: 0.2em; }
 .story-end::before { content: '> '; }
 .tldr { position: relative; border: 1px solid var(--ink); background: var(--panel); padding: 22px 18px 16px; margin-top: 18px; }
@@ -538,6 +543,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
   .lab, .lab-verdicts, .rai { grid-template-columns: 1fr; }
   .rai-tile { min-height: 0; }
   .squares { gap: 1px; }
+  .how li { grid-template-columns: 2.4em minmax(0, 1fr); }
+  .how li > span { grid-column: 2; }
   .squares .sq { width: 9px; height: 9px; }
   .exam-row, .cb-row { grid-template-columns: 1fr; gap: 6px; }
   .exam-score { text-align: left; }
