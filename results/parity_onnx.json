@@ -7,6 +7,13 @@
   "same_prediction": 380
  },
  {
+  "model": "cnn-1.2",
+  "onnx_bytes": 3959523,
+  "n_test": 380,
+  "max_abs_diff": 1.0132789611816406e-06,
+  "same_prediction": 380
+ },
+ {
   "model": "mobilenet",
   "onnx_bytes": 6440139,
   "n_test": 380,

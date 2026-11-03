@@ -102,8 +102,10 @@ def eval_transform(size: int) -> transforms.Compose:
     ])
 
 
-def train_transform(size: int) -> transforms.Compose:
-    """Augmentatie: TrashNet is overal witte achtergrond en vergelijkbaar licht."""
+def train_transform(size: int, erase: bool = False) -> transforms.Compose:
+    """Augmentatie: TrashNet is overal witte achtergrond en vergelijkbaar licht.
+    Met erase worden willekeurige stukken weggevlakt, zodat het model niet op één
+    glimplek of etiket leunt (plastic vs. glas)."""
     return transforms.Compose([
         transforms.RandomResizedCrop(size, scale=(0.6, 1.0), ratio=(0.8, 1.25)),
         transforms.RandomHorizontalFlip(),
@@ -112,6 +114,7 @@ def train_transform(size: int) -> transforms.Compose:
         transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.05),
         transforms.ToTensor(),
         transforms.Normalize(MEAN, STD),
+        *([transforms.RandomErasing(p=0.5, scale=(0.02, 0.2))] if erase else []),
     ])
 
 

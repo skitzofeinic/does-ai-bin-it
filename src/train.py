@@ -29,8 +29,9 @@ DEFAULTS = {
     "cnn": {"epochs": 200, "lr": 2e-3},
     # 15 epochs 0,907; 30 epochs 0,903, dus langer helpt niet
     "mobilenet": {"epochs": 15, "lr": 5e-4},
-    # DABI 1.2: verder trainen vanaf de gewichten van cnn (DABI 1.1), met een lagere lr
-    "cnn-1.2": {"epochs": 30, "lr": 3e-4, "init": "cnn"},
+    # DABI 1.2: een blok extra en RandomErasing, vanaf nul met dezelfde instellingen als cnn.
+    # Verder trainen vanaf cnn (30 epochs, lr 3e-4 / 1e-4 / 5e-5) bleef rond 0,79-0,81 hangen.
+    "cnn-1.2": {"epochs": 200, "lr": 2e-3, "erase": True},
 }
 
 PLASTIC, GLASS = CLASSES.index("plastic"), CLASSES.index("glas")
@@ -84,9 +85,11 @@ def main():
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--label-smoothing", type=float, default=0.0)
+    parser.add_argument("--erase", action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
     epochs = args.epochs or DEFAULTS[args.model]["epochs"]
     lr = args.lr or DEFAULTS[args.model]["lr"]
+    erase = DEFAULTS[args.model].get("erase", False) if args.erase is None else args.erase
 
     seed_everything(SEED)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -94,7 +97,7 @@ def main():
     split = load_split()
 
     loaders = {
-        "train": DataLoader(WasteDataset(split["train"], train_transform(size)),
+        "train": DataLoader(WasteDataset(split["train"], train_transform(size, erase)),
                             batch_size=args.batch_size, shuffle=True,
                             num_workers=args.workers, persistent_workers=args.workers > 0),
         "val": DataLoader(WasteDataset(split["val"], eval_transform(size)),
@@ -145,6 +148,7 @@ def main():
         "epochs": epochs,
         "lr": lr,
         "label_smoothing": args.label_smoothing,
+        "random_erasing": erase,
         "batch_size": args.batch_size,
         "class_weights": [round(w, 4) for w in weights.tolist()],
         "seed": SEED,
