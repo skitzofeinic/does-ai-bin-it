@@ -16,6 +16,7 @@ import os
 from collections import Counter
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
@@ -92,9 +93,44 @@ def load_split() -> dict[str, list[str]]:
     return {k: data[k] for k in ("train", "val", "test")}
 
 
-def eval_transform(size: int) -> transforms.Compose:
-    """Wat de browser ook doet: korte zijde naar `size`, midden uitsnijden, normaliseren."""
+def object_box(image: Image.Image, threshold: int = 40) -> tuple[int, int, int, int] | None:
+    """Vierkant rond het voorwerp, met hele getallen zodat de browser precies hetzelfde vak vindt.
+
+    TrashNet heeft overal een egale achtergrond: de achtergrondkleur is het gemiddelde van
+    de randpixels, en elke pixel die daar in een kanaal meer dan `threshold` van afwijkt
+    hoort bij het voorwerp. Het vak krijgt 20% marge, is minstens 30% van de korte zijde
+    en hooguit de korte zijde. None als er niets gevonden wordt.
+    """
+    a = np.asarray(image, dtype=np.int32)
+    h, w, _ = a.shape
+    border = np.concatenate([a[0], a[-1], a[:, 0], a[:, -1]])
+    background = border.sum(0) // len(border)
+    foreground = np.abs(a - background).max(2) > threshold
+    # Een rij of kolom telt pas mee vanaf 1% voorgrond, zodat losse ruispixels het vak niet oprekken
+    rows = np.flatnonzero(foreground.sum(1) >= max(1, w // 100))
+    cols = np.flatnonzero(foreground.sum(0) >= max(1, h // 100))
+    if len(rows) == 0 or len(cols) == 0:
+        return None
+    top, bottom, left, right = rows[0], rows[-1] + 1, cols[0], cols[-1] + 1
+    short = min(w, h)
+    side = max(bottom - top, right - left)
+    side = min(max(side + side // 5, short * 3 // 10), short)
+    x0 = min(max((left + right) // 2 - side // 2, 0), w - side)
+    y0 = min(max((top + bottom) // 2 - side // 2, 0), h - side)
+    return int(x0), int(y0), int(x0 + side), int(y0 + side)
+
+
+def object_crop(image: Image.Image) -> Image.Image:
+    """Uitsnijden rond het voorwerp, zodat kleine voorwerpen niet in een paar pixels verdwijnen."""
+    box = object_box(image)
+    return image.crop(box) if box else image
+
+
+def eval_transform(size: int, crop: bool = False) -> transforms.Compose:
+    """Wat de browser ook doet: korte zijde naar `size`, midden uitsnijden, normaliseren.
+    Met crop eerst uitsnijden rond het voorwerp (object_crop)."""
     return transforms.Compose([
+        *([transforms.Lambda(object_crop)] if crop else []),
         transforms.Resize(size),
         transforms.CenterCrop(size),
         transforms.ToTensor(),
@@ -102,12 +138,15 @@ def eval_transform(size: int) -> transforms.Compose:
     ])
 
 
-def train_transform(size: int, erase: bool = False) -> transforms.Compose:
+def train_transform(size: int, erase: bool = False, crop: bool = False,
+                    min_scale: float = 0.6) -> transforms.Compose:
     """Augmentatie: TrashNet is overal witte achtergrond en vergelijkbaar licht.
     Met erase worden willekeurige stukken weggevlakt, zodat het model niet op één
-    glimplek of etiket leunt (plastic vs. glas)."""
+    glimplek of etiket leunt (plastic vs. glas). Met crop eerst uitsnijden rond het
+    voorwerp, net als eval_transform. Een lagere min_scale zoomt verder in."""
     return transforms.Compose([
-        transforms.RandomResizedCrop(size, scale=(0.6, 1.0), ratio=(0.8, 1.25)),
+        *([transforms.Lambda(object_crop)] if crop else []),
+        transforms.RandomResizedCrop(size, scale=(min_scale, 1.0), ratio=(0.8, 1.25)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
         transforms.RandomRotation(15),

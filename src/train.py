@@ -86,10 +86,14 @@ def main():
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--label-smoothing", type=float, default=0.0)
     parser.add_argument("--erase", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--crop", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--min-scale", type=float)
     args = parser.parse_args()
     epochs = args.epochs or DEFAULTS[args.model]["epochs"]
     lr = args.lr or DEFAULTS[args.model]["lr"]
     erase = DEFAULTS[args.model].get("erase", False) if args.erase is None else args.erase
+    crop = DEFAULTS[args.model].get("crop", False) if args.crop is None else args.crop
+    min_scale = args.min_scale or DEFAULTS[args.model].get("min_scale", 0.6)
 
     seed_everything(SEED)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -97,10 +101,10 @@ def main():
     split = load_split()
 
     loaders = {
-        "train": DataLoader(WasteDataset(split["train"], train_transform(size, erase)),
+        "train": DataLoader(WasteDataset(split["train"], train_transform(size, erase, crop, min_scale)),
                             batch_size=args.batch_size, shuffle=True,
                             num_workers=args.workers, persistent_workers=args.workers > 0),
-        "val": DataLoader(WasteDataset(split["val"], eval_transform(size)),
+        "val": DataLoader(WasteDataset(split["val"], eval_transform(size, crop)),
                           batch_size=64, num_workers=args.workers,
                           persistent_workers=args.workers > 0),
     }
@@ -149,6 +153,8 @@ def main():
         "lr": lr,
         "label_smoothing": args.label_smoothing,
         "random_erasing": erase,
+        "object_crop": crop,
+        "min_scale": min_scale,
         "batch_size": args.batch_size,
         "class_weights": [round(w, 4) for w in weights.tolist()],
         "seed": SEED,
