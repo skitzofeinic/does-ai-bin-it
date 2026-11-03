@@ -170,7 +170,7 @@ export const STRINGS = {
     win: 'You win', draw: 'Draw', aiWins: 'The AI wins',
     again: 'Play again',
     winner: 'winner',
-    place: (r) => ['1st', '2nd', '3rd'][r - 1] + ' place',
+    place: (r) => `${r}${['st', 'nd', 'rd'][r - 1] || 'th'} place`,
     outOf: (n) => `of ${n} right`,
     recapTitle: 'Per photo',
     recapAria: 'Per photo: who got it right',
