@@ -78,7 +78,8 @@ Full numbers, confusion matrices, error analysis and the robustness experiment a
 ## Project structure
 
 ```
-index.html            the explainer (Dutch text; English lives in explainer/i18n.js)
+index.html            the game, shown first (Dutch text; English lives in explainer/i18n.js)
+explainer.html        the explainer: how the CNN sees, data, results (incl. 1.1 vs 1.2), lab, Responsible AI
 explainer/            app.js, preprocess.js, i18n.js, styles.css, data/web.json
 assets/examples/      16 TrashNet sample photos
 model/                cnn.onnx, mobilenet.onnx (PyTorch checkpoints are not committed)
