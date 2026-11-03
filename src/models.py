@@ -5,8 +5,8 @@ from torchvision import models
 
 from preprocess import CLASSES
 
-# Invoergrootte per model (vierkant, RGB)
-IMAGE_SIZE = {"cnn": 128, "mobilenet": 224}
+# Invoergrootte per model (vierkant, RGB). cnn = DABI 1.1, cnn-1.2 = DABI 1.2 (verder getraind vanaf 1.1)
+IMAGE_SIZE = {"cnn": 128, "cnn-1.2": 128, "mobilenet": 224}
 
 
 def conv_block(c_in: int, c_out: int) -> nn.Sequential:
@@ -48,7 +48,7 @@ def mobilenet(n_classes: int = len(CLASSES)) -> nn.Module:
 
 
 def build(name: str) -> nn.Module:
-    if name == "cnn":
+    if name in ("cnn", "cnn-1.2"):
         return WasteCNN()
     if name == "mobilenet":
         return mobilenet()
