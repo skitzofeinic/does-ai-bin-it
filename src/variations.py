@@ -3,10 +3,12 @@
 Eén aanpassing tegelijk, op alle 380 testfoto's, voor beide modellen. Geen training of
 modelkeuze: de modellen liggen vast, dit meet alleen gevoeligheid.
 
-Gebruik (vanuit does-ai-bin-it/):  python src/variations.py
+Gebruik (vanuit does-ai-bin-it/):  python src/variations.py [--model cnn-1.2]
 Schrijft `results/variations.json`. De explainer doet dezelfde aanpassingen live in de browser.
+Met --model wordt alleen dat model gemeten en bijgeschreven; de andere getallen blijven staan.
 """
 
+import argparse
 import json
 
 import numpy as np
@@ -65,13 +67,21 @@ def accuracy(model, images: list[Image.Image], labels: np.ndarray, size: int, de
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", choices=IMAGE_SIZE)
+    args = parser.parse_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     files = load_split()["test"]
     root = data_dir()
     originals = [Image.open(root / f).convert("RGB") for f in files]
     labels = np.array([label_of(f) for f in files])
-    models = {name: load_model(name, device) for name in IMAGE_SIZE}
+    names = [args.model] if args.model else list(IMAGE_SIZE)
+    models = {name: load_model(name, device) for name in names}
 
+    path = ROOT / "results" / "variations.json"
+    # Met --model: de bestaande getallen van de andere modellen bewaren
+    before = {(e["name"], r["level"]): r["accuracy"]
+              for e in json.loads(path.read_text())["experiments"] for r in e["results"]} if args.model else {}
     out = {"n_test": len(files), "classes": CLASSES, "experiments": []}
     for name, exp in EXPERIMENTS.items():
         rows = []
@@ -79,11 +89,13 @@ def main():
             changed = [exp["fn"](im, level) for im in originals]
             acc = {m: round(accuracy(models[m], changed, labels, IMAGE_SIZE[m], device), 4)
                    for m in models}
+            acc = {**before.get((name, level), {}), **acc}
+            acc = {m: acc[m] for m in IMAGE_SIZE if m in acc}
             rows.append({"level": level, "accuracy": acc})
             print(f"{name:18s} {level:>6}  " + "  ".join(f"{m} {a:.3f}" for m, a in acc.items()))
         out["experiments"].append({"name": name, "unit": exp["unit"], "neutral": exp["neutral"],
                                    "results": rows})
-    (ROOT / "results" / "variations.json").write_text(json.dumps(out, indent=1))
+    path.write_text(json.dumps(out, indent=1))
 
 
 if __name__ == "__main__":

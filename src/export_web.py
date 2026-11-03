@@ -1,14 +1,18 @@
 """Zet de gegevens voor de explainer klaar (na train.py en evaluate.py).
 
-Gebruik (vanuit does-ai-bin-it/):  python src/export_web.py
+Gebruik (vanuit does-ai-bin-it/):  python src/export_web.py [--model cnn-1.2]
 
 - `assets/examples/*.jpg`: testfoto's op 320 x 240 (bron: TrashNet), een paar per klasse
   plus de meest leerzame fouten;
 - `explainer/data/web.json`: klassen, aantallen per split, de voorbeelden met de kansen
   die PyTorch er zelf voor geeft (referentie voor de browsercontrole), dezelfde kansen
-  voor een synthetisch testbeeld zonder JPEG, en de filters van de eerste CNN-laag.
+  voor een synthetisch testbeeld zonder JPEG, en de filters van de eerste laag per DABI-versie.
+
+Met --model komt er één model bij in een bestaande web.json: dezelfde voorbeeldfoto's,
+alleen de kansen (en filters) van dat model worden toegevoegd of vervangen.
 """
 
+import argparse
 import json
 
 import numpy as np
@@ -16,7 +20,7 @@ import torch
 from PIL import Image
 
 from evaluate import load_model
-from models import IMAGE_SIZE
+from models import IMAGE_SIZE, WIDTHS
 from preprocess import (CLASSES, ROOT, SEED, class_counts, data_dir,
                         eval_transform, label_of, load_split, list_images)
 
@@ -82,7 +86,29 @@ def conv1(model) -> dict:
             "bias": [round(b, 6) for b in bias.tolist()]}
 
 
+def add_model(name: str):
+    """Eén model toevoegen aan de bestaande web.json, zonder de voorbeelden opnieuw te kiezen."""
+    model = {name: load_model(name)}
+    data = json.loads(WEB.read_text())
+    for ex in data["examples"]:
+        ex["probabilities"].update(probabilities(model, Image.open(EXAMPLES / ex["file"]).convert("RGB")))
+    data["synthetic"]["probabilities"].update(probabilities(model, synthetic()))
+    data["image_size"] = IMAGE_SIZE
+    if "shape" in data["conv1"]:  # oude web.json: alleen de filters van DABI 1.1
+        data["conv1"] = {"cnn": data["conv1"]}
+    if name in WIDTHS:
+        data["conv1"][name] = conv1(model[name])
+    WEB.write_text(json.dumps(data, separators=(",", ":")))
+    print(f"{name} toegevoegd aan {WEB} ({WEB.stat().st_size / 1000:.0f} kB)")
+
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", choices=IMAGE_SIZE)
+    args = parser.parse_args()
+    if args.model:
+        return add_model(args.model)
+
     models = {name: load_model(name) for name in IMAGE_SIZE}
     split = load_split()
     root = data_dir()
@@ -109,7 +135,7 @@ def main():
         "split_counts": {k: class_counts(v) for k, v in split.items()},
         "examples": examples,
         "synthetic": {"w": 320, "h": 240, "probabilities": probabilities(models, synthetic())},
-        "conv1": conv1(models["cnn"]),
+        "conv1": {name: conv1(models[name]) for name in WIDTHS},
     }
     WEB.parent.mkdir(parents=True, exist_ok=True)
     WEB.write_text(json.dumps(data, separators=(",", ":")))
