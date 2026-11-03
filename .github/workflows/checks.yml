@@ -1,0 +1,34 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # Node runs the browser preprocessing in the JS parity test
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # CPU wheels first, so requirements.txt doesn't pull in the large CUDA build
+      - name: Install dependencies
+        run: |
+          pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Check explainer JavaScript syntax
+        run: for f in explainer/*.js; do node --check "$f"; done
+
+      - name: Run tests
+        run: python -m pytest tests -v
