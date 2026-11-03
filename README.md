@@ -52,7 +52,7 @@ Full numbers, confusion matrices, error analysis and the robustness experiment a
 | metal | `metal` | 410 |
 | residual waste | `trash` | 137 |
 
-- **Not in this repository.** The GitHub README gives no data license and asks for attribution, so only 16 sample photos are included (`assets/examples/`). The scripts look for the dataset in `~/.cache/waste-classifier/dataset-resized`. Set `WASTE_DATA` to use another folder.
+- **Not in this repository.** TrashNet is MIT-licensed (the dataset zip lives in its GitHub repository), but the full set is 42 MB and easy to download, so only 16 sample photos are included (`assets/examples/`, with the MIT notice in `assets/examples/LICENSE`). The scripts look for the dataset in `~/.cache/waste-classifier/dataset-resized`. Set `WASTE_DATA` to use another folder.
 - **Stratified 70 / 15 / 15 split, seed 42** (1,768 / 379 / 380). The filenames are stored in `results/split.json`, so both models are judged on exactly the same test photos. All choices were made on validation; each model used the test set once, at the end.
 - **Imbalance handled explicitly.** Residual waste has over 7× fewer photos than paper and cardboard. Training uses class weights in the loss, and evaluation reports per-class recall, not just accuracy.
 
@@ -133,4 +133,12 @@ Retraining gives similar but not identical numbers, because cuDNN on the GPU is 
 
 ## Credits
 
-Dataset: Gary Thung and Mindy Yang, *Classification of Trash for Recyclability Status*, 2017 ([TrashNet](https://github.com/garythung/trashnet)). Bin colours follow the official Dutch waste pictograms (afvalcirculair.nl).
+Dataset: Gary Thung and Mindy Yang, *Classification of Trash for Recyclability Status*, 2017 ([TrashNet](https://github.com/garythung/trashnet), MIT License).
+
+Papers: Howard et al., [*Searching for MobileNetV3*](https://arxiv.org/abs/1905.02244), ICCV 2019. Russakovsky et al., [*ImageNet Large Scale Visual Recognition Challenge*](https://arxiv.org/abs/1409.0575), IJCV 2015. Zhong et al., [*Random Erasing Data Augmentation*](https://arxiv.org/abs/1708.04896), AAAI 2020.
+
+Software: PyTorch (BSD), torchvision (BSD-3-Clause), ONNX Runtime (MIT), JetBrains Mono (SIL Open Font License 1.1).
+
+Bin colours follow the Dutch waste-separation set by Rijkswaterstaat, designed by Mijksenaar ([guidelines](https://www.afvalcirculair.nl/publish/pages/124417/rws_richtlijnen_pictogrammenset_def-toegankelijk.pdf)). The usage right is granted without limit for promoting waste separation; the pictograms themselves may not be modified, and this project only uses the colours.
+
+The MobileNet weights come from torchvision and were pretrained on ImageNet. ImageNet's [terms of access](https://image-net.org/download) limit the database to non-commercial research and education; whether that also binds weights trained on it is not settled. A school project is within those terms; check them before any commercial use.
