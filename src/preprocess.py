@@ -28,6 +28,11 @@ SEED = 42
 
 # Vijf klassen; papier en karton gaan in Nederland in dezelfde bak
 CLASSES = ["papier en karton", "glas", "plastic", "metaal", "restafval"]
+
+# De Nederlandse bakken: plastic en metaal (blik) gaan samen in PMD. De modellen leren de vijf
+# materialen; de kans op een bak is de som van de kansen op de materialen erin.
+BINS = ["papier en karton", "glas", "PMD", "restafval"]
+CLASS_TO_BIN = [0, 1, 2, 2, 3]
 TRASHNET_TO_CLASS = {
     "paper": 0,
     "cardboard": 0,

@@ -1,0 +1,207 @@
+{
+ "n_test": 380,
+ "classes": [
+  "papier en karton",
+  "glas",
+  "PMD",
+  "restafval"
+ ],
+ "experiments": [
+  {
+   "name": "licht",
+   "unit": "x helderheid",
+   "neutral": 1.0,
+   "results": [
+    {
+     "level": 0.25,
+     "accuracy": {
+      "cnn": 0.3974,
+      "cnn-1.2": 0.4421,
+      "mobilenet": 0.7237
+     }
+    },
+    {
+     "level": 0.5,
+     "accuracy": {
+      "cnn": 0.5737,
+      "cnn-1.2": 0.6316,
+      "mobilenet": 0.9211
+     }
+    },
+    {
+     "level": 0.75,
+     "accuracy": {
+      "cnn": 0.8026,
+      "cnn-1.2": 0.8289,
+      "mobilenet": 0.9237
+     }
+    },
+    {
+     "level": 1.0,
+     "accuracy": {
+      "cnn": 0.8079,
+      "cnn-1.2": 0.8474,
+      "mobilenet": 0.9158
+     }
+    },
+    {
+     "level": 1.5,
+     "accuracy": {
+      "cnn": 0.7447,
+      "cnn-1.2": 0.8053,
+      "mobilenet": 0.9
+     }
+    },
+    {
+     "level": 2.0,
+     "accuracy": {
+      "cnn": 0.5658,
+      "cnn-1.2": 0.6211,
+      "mobilenet": 0.8
+     }
+    }
+   ]
+  },
+  {
+   "name": "draaien",
+   "unit": "graden",
+   "neutral": 0,
+   "results": [
+    {
+     "level": 0,
+     "accuracy": {
+      "cnn": 0.8079,
+      "cnn-1.2": 0.8474,
+      "mobilenet": 0.9158
+     }
+    },
+    {
+     "level": 15,
+     "accuracy": {
+      "cnn": 0.8053,
+      "cnn-1.2": 0.8079,
+      "mobilenet": 0.9132
+     }
+    },
+    {
+     "level": 30,
+     "accuracy": {
+      "cnn": 0.7921,
+      "cnn-1.2": 0.8079,
+      "mobilenet": 0.8947
+     }
+    },
+    {
+     "level": 45,
+     "accuracy": {
+      "cnn": 0.7632,
+      "cnn-1.2": 0.8,
+      "mobilenet": 0.8711
+     }
+    },
+    {
+     "level": 90,
+     "accuracy": {
+      "cnn": 0.7658,
+      "cnn-1.2": 0.7947,
+      "mobilenet": 0.9184
+     }
+    },
+    {
+     "level": 180,
+     "accuracy": {
+      "cnn": 0.7789,
+      "cnn-1.2": 0.8289,
+      "mobilenet": 0.9316
+     }
+    }
+   ]
+  },
+  {
+   "name": "vervagen",
+   "unit": "px straal",
+   "neutral": 0,
+   "results": [
+    {
+     "level": 0,
+     "accuracy": {
+      "cnn": 0.8079,
+      "cnn-1.2": 0.8474,
+      "mobilenet": 0.9158
+     }
+    },
+    {
+     "level": 2,
+     "accuracy": {
+      "cnn": 0.7789,
+      "cnn-1.2": 0.7737,
+      "mobilenet": 0.9053
+     }
+    },
+    {
+     "level": 4,
+     "accuracy": {
+      "cnn": 0.5763,
+      "cnn-1.2": 0.5921,
+      "mobilenet": 0.8079
+     }
+    },
+    {
+     "level": 8,
+     "accuracy": {
+      "cnn": 0.3816,
+      "cnn-1.2": 0.3895,
+      "mobilenet": 0.6474
+     }
+    },
+    {
+     "level": 16,
+     "accuracy": {
+      "cnn": 0.3763,
+      "cnn-1.2": 0.3921,
+      "mobilenet": 0.45
+     }
+    }
+   ]
+  },
+  {
+   "name": "kleiner op donker",
+   "unit": "x formaat",
+   "neutral": 1.0,
+   "results": [
+    {
+     "level": 1.0,
+     "accuracy": {
+      "cnn": 0.8079,
+      "cnn-1.2": 0.8474,
+      "mobilenet": 0.9158
+     }
+    },
+    {
+     "level": 0.75,
+     "accuracy": {
+      "cnn": 0.6026,
+      "cnn-1.2": 0.7053,
+      "mobilenet": 0.9158
+     }
+    },
+    {
+     "level": 0.5,
+     "accuracy": {
+      "cnn": 0.4632,
+      "cnn-1.2": 0.6316,
+      "mobilenet": 0.7816
+     }
+    },
+    {
+     "level": 0.35,
+     "accuracy": {
+      "cnn": 0.4053,
+      "cnn-1.2": 0.5342,
+      "mobilenet": 0.5395
+     }
+    }
+   ]
+  }
+ ]
+}

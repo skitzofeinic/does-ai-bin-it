@@ -118,6 +118,7 @@ python src/evaluate.py --duplicates       # near-duplicates between train and te
 python src/export.py                      # ONNX export + parity check
 python src/export_web.py                  # data for the explainer
 python src/variations.py                  # light / angle / blur / background experiment
+python src/evaluate_bins.py               # scores and robustness per Dutch bin (PMD = plastic + metal), from the ONNX models
 python -m pytest tests                    # JS test is skipped without Node
 ```
 

@@ -46,28 +46,33 @@ def evaluate(name: str) -> dict:
     files = load_split()["test"]
     labels = np.array(WasteDataset(files, None).labels)
     probs = predict(load_model(name, device), files, IMAGE_SIZE[name], device)
+    return summarize(name, files, labels, probs, CLASSES)
+
+
+def summarize(name: str, files: list[str], labels: np.ndarray, probs: np.ndarray, classes: list[str]) -> dict:
+    """Scores uit kansen (N, len(classes)); ook gebruikt voor de vier bakken (evaluate_bins.py)."""
     preds, conf = probs.argmax(1), probs.max(1)
     correct = preds == labels
 
     precision, recall, f1, support = precision_recall_fscore_support(
-        labels, preds, labels=range(len(CLASSES)), zero_division=0)
+        labels, preds, labels=range(len(classes)), zero_division=0)
     mistakes = sorted(
-        ({"file": files[i], "true": CLASSES[labels[i]], "predicted": CLASSES[preds[i]],
+        ({"file": files[i], "true": classes[labels[i]], "predicted": classes[preds[i]],
           "confidence": round(float(conf[i]), 4)} for i in np.where(~correct)[0]),
         key=lambda m: -m["confidence"])
     return {
         "model": name,
-        "classes": CLASSES,
+        "classes": classes,
         "n_test": len(files),
         "accuracy": round(float(accuracy_score(labels, preds)), 4),
         "balanced_accuracy": round(float(balanced_accuracy_score(labels, preds)), 4),
         "per_class": [
             {"class": c, "precision": round(float(p), 4), "recall": round(float(r), 4),
              "f1": round(float(f), 4), "support": int(s)}
-            for c, p, r, f, s in zip(CLASSES, precision, recall, f1, support)
+            for c, p, r, f, s in zip(classes, precision, recall, f1, support)
         ],
         # rij = echte klasse, kolom = voorspelde klasse
-        "confusion_matrix": confusion_matrix(labels, preds, labels=range(len(CLASSES))).tolist(),
+        "confusion_matrix": confusion_matrix(labels, preds, labels=range(len(classes))).tolist(),
         "mean_confidence_correct": round(float(conf[correct].mean()), 4),
         "mean_confidence_wrong": round(float(conf[~correct].mean()), 4) if (~correct).any() else None,
         "confident_mistakes": int(((~correct) & (conf >= CONFIDENT)).sum()),
