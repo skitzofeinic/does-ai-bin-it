@@ -1,6 +1,6 @@
 """Exporteer de getrainde modellen naar ONNX en controleer dat ONNX hetzelfde voorspelt.
 
-Gebruik (vanuit docs/Anh/waste-classifier/):  python src/export.py
+Gebruik (vanuit does-ai-bin-it/):  python src/export.py
 
 - `model/<naam>.onnx`: invoer `image` (N, 3, S, S, genormaliseerd), uitvoer `probabilities` (N, 5);
 - `results/parity_onnx.json`: verschil PyTorch vs ONNX Runtime (Python) op de hele testset.

@@ -7,6 +7,6 @@ __pycache__/
 # PyTorch-checkpoints; de browser gebruikt de ONNX-export
 model/*.pt
 
-# De dataset staat buiten de repository (zie DECISIONS.md); dit vangt een per ongeluk lokale kopie af.
+# De dataset staat buiten de repository; dit vangt een per ongeluk lokale kopie af.
 # Met / ervoor alleen in deze map, niet explainer/data/ (gegevens voor de site)
 /data/

@@ -1,4 +1,4 @@
-"""Tests voor klassen, split en voorbewerking. Draaien vanuit docs/Anh/waste-classifier/:
+"""Tests voor klassen, split en voorbewerking. Draaien vanuit does-ai-bin-it/:
 
     python -m pytest tests
 """

@@ -2,7 +2,7 @@
 
 De testset wordt hier niet aangeraakt; dat doet evaluate.py, één keer per model.
 
-Gebruik (vanuit docs/Anh/waste-classifier/):
+Gebruik (vanuit does-ai-bin-it/):
     python src/train.py --model cnn
     python src/train.py --model mobilenet
 

@@ -3,7 +3,7 @@
 Eén aanpassing tegelijk, op alle 380 testfoto's, voor beide modellen. Geen training of
 modelkeuze: de modellen liggen vast, dit meet alleen gevoeligheid.
 
-Gebruik (vanuit docs/Anh/waste-classifier/):  python src/variations.py
+Gebruik (vanuit does-ai-bin-it/):  python src/variations.py
 Schrijft `results/variations.json`. De explainer doet dezelfde aanpassingen live in de browser.
 """
 

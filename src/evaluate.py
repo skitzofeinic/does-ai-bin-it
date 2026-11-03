@@ -1,6 +1,6 @@
 """Evalueer een getraind model op de testset. Eén keer per model, na de training.
 
-Gebruik (vanuit docs/Anh/waste-classifier/):
+Gebruik (vanuit does-ai-bin-it/):
     python src/evaluate.py --model cnn
     python src/evaluate.py --model mobilenet
     python src/evaluate.py --duplicates      # schatting bijna-duplicaten train/test

@@ -1,6 +1,6 @@
 """Zet de gegevens voor de explainer klaar (na train.py en evaluate.py).
 
-Gebruik (vanuit docs/Anh/waste-classifier/):  python src/export_web.py
+Gebruik (vanuit does-ai-bin-it/):  python src/export_web.py
 
 - `assets/examples/*.jpg`: testfoto's op 320 x 240 (bron: TrashNet), een paar per klasse
   plus de meest leerzame fouten;

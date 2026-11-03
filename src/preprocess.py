@@ -7,7 +7,7 @@ De dataset (TrashNet, `dataset-resized`) staat buiten de repository:
 standaard `~/.cache/waste-classifier/dataset-resized`, aan te passen met
 de omgevingsvariabele `WASTE_DATA`.
 
-Gebruik (vanuit docs/Anh/waste-classifier/):  python src/preprocess.py
+Gebruik (vanuit does-ai-bin-it/):  python src/preprocess.py
 maakt `results/split.json` aan als die nog niet bestaat.
 """
 
@@ -48,7 +48,7 @@ def data_dir() -> Path:
     if not (path / "glass").is_dir():
         raise SystemExit(
             f"TrashNet niet gevonden in {path}. Pak dataset-resized.zip daar uit "
-            "of zet WASTE_DATA op de juiste map (zie DECISIONS.md)."
+            "of zet WASTE_DATA op de juiste map."
         )
     return path
 
