@@ -7,7 +7,7 @@
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
 import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js?v=2026-11-02';
-import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-04o';
+import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-09a';
 
 const GAME = document.body.dataset.page === 'spel';
 

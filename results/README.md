@@ -56,7 +56,7 @@ restafval           0   4   0   1  15      1   1   0   1  17
 ## Wat opvalt
 
 - **Voorkennis telt**: het voorgetrainde model maakt ruim de helft minder fouten dan DABI 1.1 (35 tegenover 78), met maar 1.768 eigen trainingsfoto's voor allemaal.
-- **DABI 1.2 haalt een deel in**: 61 fouten in plaats van 78, beter op elke klasse. Van het verschil met 1.1 komt ongeveer de helft van de extra laag en de helft van het wegvlakken (validatie, gemiddelde van de laatste 20 epochs: 1.1 0,773, alleen extra laag 0,800, extra laag + wegvlakken 0,826).
+- **DABI 1.2 haalt een deel in**: 61 fouten in plaats van 78, beter op elke klasse. Van het verschil met DABI 1.1 komt ongeveer de helft van de extra laag en de helft van het wegvlakken (validatie, gemiddelde van de laatste 20 epochs: DABI 1.1 0,773, alleen extra laag 0,800, extra laag + wegvlakken 0,826).
 - **Plastic wordt vaak glas**: DABI 1.1 12 van 73, DABI 1.2 8, MobileNet 4. Doorzichtig, glanzend, vergelijkbare vorm. Transparantie is een eigenschap, geen materiaal.
 - **Restafval is het zwakst** bij alle drie. Met 20 testfoto's verschuift één foto de recall al 5 procentpunt; dit cijfer is dus onzeker.
 - **Zeker is niet hetzelfde als juist**: DABI 1.1 was 97% zeker dat een tijdschriftpagina restafval was, DABI 1.2 90% zeker dat een doorzichtige plastic fles glas was, MobileNet 94% zeker dat een blik glas was. Hoe beter het model, hoe groter het deel van de fouten dat overtuigd is: 17%, 25%, 43%.
@@ -67,7 +67,7 @@ Vóór de keuze zijn varianten op de validatieset vergeleken (gemiddelde van de 
 
 | Variant | Gebalanceerde accuracy | Plastic als glas |
 |---|---|---|
-| Verder trainen vanaf DABI 1.1, 30 epochs, lr 3e-4 / 1e-4 / 5e-5 | 0,77–0,79 | 6–7 |
+| Verder trainen vanaf DABI 1.1, 30 epochs, lr 3e-4 / 1e-4 / 5e-5 | 0,78 | 6–7 |
 | **Extra laag + wegvlakken (DABI 1.2)** | **0,826** | **4,0** |
 | + verder inzoomen (crops van 30–100% in plaats van 60–100%) | 0,800 | 7,0 |
 | + uitsnijden rond het voorwerp | 0,819 | 8,0 |
@@ -111,8 +111,8 @@ Op alle 380 testfoto's geven de ONNX-modellen (ONNX Runtime, Python) **dezelfde 
 De explainer controleert dit live in de browser van de bezoeker (sectie "Meer weten") en toont de eigen uitkomst. Gemeten in Brave (Chromium), headless, over meerdere sessies:
 
 - **Verkleinen en uitsnijden**: in JavaScript bit voor bit gelijk aan Pillow/torchvision, op zes beeldformaten (automatische test `tests/test_preprocess_js.py`, ook het afronden bij een halve pixel).
-- **Zelfde pixels** (een synthetisch testbeeld uit een formule, zonder JPEG): grootste verschil in een kans 0,0004 tot 0,0006 procentpunt (DABI 1.1 en 1.2) en 0,008 tot 0,16 procentpunt (MobileNet). Dat is afronding van kommagetallen in ONNX Runtime Web; bij MobileNet stapelt die zich op over meer lagen.
-- **Echte JPEG-voorbeelden** (16 foto's × 3 modellen): steeds 48 van de 48 voorspellingen gelijk, maar de zekerheid verschilt 0,1 tot 2,6 procentpunt. Browsers openen een JPEG net iets anders dan Pillow (in onze meting was 37 tot 49% van de pixels 1 of 2 op 255 anders). Onzichtbaar, maar het model merkt het.
+- **Zelfde pixels** (een synthetisch testbeeld uit een formule, zonder JPEG): grootste verschil in een kans 0,0004 tot 0,0006 procentpunt (DABI 1.1 en DABI 1.2) en 0,008 tot 0,16 procentpunt (MobileNet). Dat is afronding van kommagetallen in ONNX Runtime Web; bij MobileNet stapelt die zich op over meer lagen.
+- **Echte JPEG-voorbeelden** (16 foto's × 3 modellen): 48 van de 48 voorspellingen gelijk in de laatste meting (eerder, met twee modellen, steeds 32 van de 32). De zekerheid verschilde in die eerdere metingen 0,1 tot 2,6 procentpunt. Browsers openen een JPEG net iets anders dan Pillow (in onze meting was 37 tot 49% van de pixels 1 of 2 op 255 anders). Onzichtbaar, maar het model merkt het.
 
 ## Variaties: buiten wit papier
 
