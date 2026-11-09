@@ -69,6 +69,8 @@
 
 *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
 html { scroll-behavior: smooth; }
+/* Nooit zijwaarts scrollen; clip in plaats van hidden, zodat de plakkende tabbalk blijft werken */
+html, body { overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
@@ -472,7 +474,7 @@ button.bin:disabled { cursor: default; }
 .mark.ok { background: linear-gradient(90deg, var(--bin-0) 0 20%, var(--bin-1) 20% 40%, var(--bin-2) 40% 60%, var(--bin-3) 60% 80%, var(--bin-4) 80%); }
 .mark.wrong { border: 2px solid var(--ink-2); }
 .mark.sure { background: var(--accent-deep); }
-.exam { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(14px, 2vw, 24px); }
+.exam { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: clamp(14px, 2vw, 24px); }
 .exam-model { display: grid; gap: 12px; align-content: start; padding: clamp(12px, 1.6vw, 20px); border: 2px dotted var(--line); } /* één kader per model */
 .exam-num { font-size: clamp(3.4rem, 2rem + 5.4vw, 7.4rem); font-variant-numeric: tabular-nums; }
 .exam-name { display: flex; align-items: center; gap: 8px; font-weight: 700; text-transform: uppercase; }
@@ -538,7 +540,7 @@ button.bin:disabled { cursor: default; }
 .vs-key-line.worse { background: var(--bad); }
 
 /* waar gaat het mis */
-.mixups { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(20px, 4vw, 56px); }
+.mixups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: clamp(20px, 4vw, 56px); }
 .mix-col { display: grid; gap: 14px; align-content: start; }
 .mix-row { display: grid; grid-template-columns: 3.6em minmax(0, 1fr); gap: 2px 14px; align-items: center; }
 .mix-count { grid-row: span 3; font-size: 1.8rem; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; }
@@ -734,7 +736,8 @@ table.data thead th { color: var(--ink-2); font-weight: 700; border-bottom: 1px 
   .rounds { margin-left: 0; width: 100%; }
   .versus { display: grid; grid-template-columns: 1fr; gap: 4px; width: 100%; }
   .vs { justify-self: center; font-size: 0.9rem; }
-  .pixel-panel { grid-template-columns: 1fr; }
+  .pixel-panel { grid-template-columns: minmax(0, 1fr); }
+  .ch-head { white-space: normal; }
   .ch { grid-template-columns: 5em minmax(0, 1fr) 2.6em 5.6em; gap: 6px; }
   .feature-maps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }

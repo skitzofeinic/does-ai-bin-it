@@ -7,7 +7,7 @@
 // berekende kansen voor de voorbeeldfoto's en schakelt uploads en schuifjes uit.
 
 import { preprocess, toRGB, brightness, boxBlur, MEAN, STD, DARK, REFERENCE_WIDTH } from './preprocess.js?v=2026-11-02';
-import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-09a';
+import { STRINGS, HTML_EN, ATTR_EN, NOTES_EN } from './i18n.js?v=2026-11-09b';
 
 const GAME = document.body.dataset.page === 'spel';
 
@@ -1278,6 +1278,15 @@ function renderParity() {
 
 // ---------- IDE: actieve tab volgt het scrollen ----------
 
+// Schuift alleen de tabbalk zelf, niet de pagina (scrollIntoView zou ook verticaal scrollen)
+function centerTab(tab) {
+  const nav = tab.parentElement;
+  const n = nav.getBoundingClientRect();
+  const a = tab.getBoundingClientRect();
+  const left = nav.scrollLeft + a.left - n.left - (n.width - a.width) / 2;
+  nav.scrollTo({ left, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+
 function setupIde() {
   // Alleen tabs naar een hoofdstuk op deze pagina; de rest linkt naar de andere pagina
   const tabs = new Map([...document.querySelectorAll('[data-tab]')].map((a) => [a.dataset.tab, a]));
@@ -1287,6 +1296,7 @@ function setupIde() {
       for (const a of tabs.values()) a.removeAttribute('aria-current');
       const tab = tabs.get(entry.target.id);
       tab.setAttribute('aria-current', 'page');
+      centerTab(tab);
     }
   }, { rootMargin: '-45% 0px -54% 0px' });
   for (const id of tabs.keys()) observer.observe(document.getElementById(id));
