@@ -149,6 +149,10 @@ Retraining gives similar but not identical numbers, because cuDNN on the GPU is 
 - **Near-duplicates.** TrashNet likely contains several photos of the same object. A hash comparison found 2 real duplicates between train and test. That is a lower bound, so test scores may be slightly optimistic.
 - **Small classes.** Each class has 20 to 149 test photos, so differences of a few percent are not meaningful.
 
+## License
+
+[MIT](LICENSE) for this project's own code, site and the DABI 1.1 and DABI 1.2 models. The TrashNet sample photos and `model/mobilenet.onnx` are not covered; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 ## Credits
 
 Dataset: Gary Thung and Mindy Yang, *Classification of Trash for Recyclability Status*, 2017 ([TrashNet](https://github.com/garythung/trashnet), MIT License).
