@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wat bakt AI ervan?</title>
-  <meta name="description" content="Sorteer afval tegen twee AI-modellen. Zie hoe een zelf getraind CNN kijkt, hoe vaak het gelijk heeft en wanneer het overtuigd de mist in gaat.">
+  <meta name="description" content="Sorteer afval tegen drie AI-modellen. Zie hoe DABI, een zelf getraind CNN, kijkt, hoe vaak het gelijk heeft en wanneer het overtuigd de mist in gaat.">
   <meta name="theme-color" content="#f3f3f3">
   <script>
     // Thema vóór het tekenen zetten: eerdere keuze, anders de systeeminstelling
@@ -13,32 +13,33 @@
       try { t = localStorage.getItem('theme'); } catch (e) {}
       if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       document.documentElement.dataset.theme = t;
-      if (t === 'dark') document.querySelector('meta[name="theme-color"]').content = '#1c1c1f';
+      if (t === 'dark') document.querySelector('meta[name="theme-color"]').content = '#151517';
     })();
   </script>
   <link rel="icon" href="explainer/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
-  <link rel="stylesheet" href="explainer/styles.css?v=2026-11-05b">
+  <link rel="stylesheet" href="explainer/styles.css?v=2026-11-09b">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
   <!-- ?v=… : verhoog bij elke wijziging, anders kan een browser een oude app.js bij nieuwe HTML gebruiken -->
-  <script type="module" src="explainer/app.js?v=2026-11-05a"></script>
+  <script type="module" src="explainer/app.js?v=2026-11-09b"></script>
 </head>
-<body>
+<!-- Het spel, als eerste pagina; de uitleg staat in explainer.html -->
+<body data-page="spel">
   <header class="ide-top">
     <span class="ide-title" data-i18n="ideTitle">wat-bakt-ai-ervan</span>
     <nav class="tabs" aria-label="Onderdelen" data-i18n-attr="aria-label:navLabel">
-      <a href="#top" data-tab="top">README.md</a>
       <a href="#spel" data-tab="spel" data-i18n="tab_spel">spel.js</a>
-      <a href="#machine" data-tab="machine" data-i18n="tab_machine">kijk.py</a>
-      <a href="#data" data-tab="data" data-i18n="tab_data">data.csv</a>
-      <a href="#toets" data-tab="toets" data-i18n="tab_toets">resultaten.json</a>
-      <a href="#lab" data-tab="lab" data-i18n="tab_lab">lab.js</a>
-      <a href="#vertrouwen" data-tab="vertrouwen" data-i18n="tab_vertrouwen">vertrouwen.md</a>
-      <a href="#rai" data-tab="rai" data-i18n="tab_rai">responsible-ai.md</a>
-      <a href="#vragen" data-tab="vragen" data-i18n="tab_vragen">vragen.md</a>
-      <a href="#over" data-tab="over" data-i18n="tab_over">colofon.md</a>
+      <a href="explainer.html">README.md</a>
+      <a href="explainer.html#machine" data-i18n="tab_machine">kijk.py</a>
+      <a href="explainer.html#data" data-i18n="tab_data">data.csv</a>
+      <a href="explainer.html#toets" data-i18n="tab_toets">resultaten.json</a>
+      <a href="explainer.html#lab" data-i18n="tab_lab">lab.js</a>
+      <a href="explainer.html#vertrouwen" data-i18n="tab_vertrouwen">vertrouwen.md</a>
+      <a href="explainer.html#rai" data-i18n="tab_rai">responsible-ai.md</a>
+      <a href="explainer.html#vragen" data-i18n="tab_vragen">vragen.md</a>
+      <a href="explainer.html#over" data-i18n="tab_over">colofon.md</a>
     </nav>
     <span class="hdr-status" id="status" data-state="loading" role="status">laden…</span>
     <div class="hdr-tools">
@@ -46,27 +47,18 @@
       <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Donkere modus" title="Donkere modus">◐</button>
     </div>
   </header>
-  <!-- HERO -->
-  <header class="hero field" id="top">
-    <div class="hero-main">
-      <h1 class="giant" data-i18n="h1">Wat bakt<br>AI ervan?</h1>
-      <div class="hero-side">
-        <p class="lead" data-i18n="heroLead">Twee AI's sorteren afval op een foto. Speel tegen ze, kijk mee in hun hoofd, en ontdek wanneer ze overtuigd de mist in gaan.</p>
-        <a class="button" href="#spel" data-i18n="heroCta">Speel: jij vs AI</a>
-        <p class="fine" data-i18n="heroFine">Lesvoorbeeld, geen afvalwijzer: wat in welke bak mag, verschilt per gemeente.</p>
-      </div>
-    </div>
-    <div class="hero-bins" id="hero-bins" aria-hidden="true"></div>
-  </header>
 
   <main>
     <!-- 1 SPEL -->
-    <section class="chapter field" id="spel" aria-labelledby="spel-title">
+    <section class="chapter field play" id="spel" aria-labelledby="spel-title">
       <div class="wrap">
         <p class="sec-label" aria-hidden="true" data-i18n="sec_spel">// 01 · spel.js</p>
         <div class="chapter-head">
-          <h2 class="head" id="spel-title" data-i18n="spelTitle">Sorteer mee</h2>
-          <p class="lead" data-i18n="spelLead">Acht foto's die de AI's nooit zagen. Kies eerst zelf, dan zie je wat ze zeiden.</p>
+          <h1 class="head" id="spel-title" data-i18n="playTitle">Wat bakt AI ervan?</h1>
+          <div class="play-intro">
+            <p class="lead" data-i18n="spelLead">Acht foto's die de AI's nooit zagen. Kies eerst zelf, dan zie je wat ze zeiden.</p>
+            <p class="fine" data-i18n="heroFine">Lesvoorbeeld, geen afvalwijzer: wat in welke bak mag, verschilt per gemeente.</p>
+          </div>
         </div>
         <div class="game" id="game"></div>
         <div class="scoreboard" id="scoreboard" aria-live="polite"></div>
@@ -83,270 +75,12 @@
           <p class="error" id="upload-error" role="alert" hidden></p>
           <div class="own-result" id="own-result" hidden></div>
         </div>
-      </div>
-    </section>
-
-    <!-- 2 MACHINE -->
-    <section class="chapter field" id="machine" aria-labelledby="machine-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_machine">// 02 · kijk.py</p>
-        <div class="chapter-head">
-          <h2 class="head" id="machine-title" data-i18n="machineTitle">Hoe het kijkt</h2>
-          <p class="lead" data-i18n="machineLead">Van foto naar oordeel in vier stappen. Dit is het eigen CNN, live op jouw foto.</p>
-        </div>
-        <div class="strip" data-thumbs></div>
-        <ol class="kijk">
-          <!-- 1 + 2: foto en pixels -->
-          <li class="kijk-step kijk-pixels">
-            <div class="kijk-photo">
-              <h3 data-i18n="step1"><span class="step">1</span> Foto</h3>
-              <div class="stage-visual"><canvas id="stage-photo" data-i18n-attr="aria-label:stagePhotoAria" aria-label="De gekozen foto"></canvas></div>
-              <p class="fine" data-i18n="step1Fine">Wat jij ziet.</p>
-            </div>
-            <div class="kijk-grid">
-              <h3 data-i18n="step2"><span class="step">2</span> Wat het model krijgt: 128 × 128 pixels</h3>
-              <div class="pixel-panel">
-                <div class="stage-visual pixel-wrap">
-                  <canvas id="pixel-canvas" width="128" height="128" class="pixelated" data-i18n-attr="aria-label:pixelCanvasAria" aria-label="128 bij 128 pixels; beweeg of tik om één pixel te bekijken"></canvas>
-                  <span class="pixel-marker" id="pixel-marker" aria-hidden="true"></span>
-                </div>
-                <div class="pixel-readout">
-                  <p class="fine" id="pixel-pos" data-i18n="pixelPosInit">Beweeg of tik op het beeld.</p>
-                  <div id="pixel-channels" class="channels"></div>
-                  <div class="zoom-wrap">
-                    <canvas id="pixel-zoom" width="7" height="7" class="pixelated zoom" aria-hidden="true"></canvas>
-                    <p class="fine" data-i18n="zoomFine">Ingezoomd: 7 × 7 pixels rond je cursor.</p>
-                  </div>
-                  <p class="fine" data-i18n="pixelExplain">Elke pixel is <b>3 getallen</b>: hoeveel rood, groen en blauw (0 = niets, 255 = vol). 128 × 128 × 3 = <b>49.152 getallen</b>. Het model krijgt ze geschaald rond 0.</p>
-                </div>
-              </div>
-            </div>
-          </li>
-          <!-- 3: filters -->
-          <li class="kijk-step">
-            <h3 data-i18n="step3"><span class="step">3</span> Laag 1: 32 filters</h3>
-            <p class="fine kijk-intro" data-i18n="step3Intro">Elk filter is een raampje van 3 × 3 pixels dat over de foto schuift en één patroon zoekt, zoals een rand of een kleurovergang. Het model leerde ze zelf. Hoe lichter de kaart, hoe sterker het filter daar reageert. Klik op een kaart.</p>
-            <div class="filters-panel">
-              <div id="feature-maps" class="feature-maps" role="group" data-i18n-attr="aria-label:mapsAria" aria-label="32 filterkaarten"></div>
-              <aside class="filter-detail" id="filter-detail" aria-live="polite"></aside>
-            </div>
-          </li>
-          <!-- 4: oordeel -->
-          <li class="kijk-step kijk-verdict">
-            <div>
-              <h3 data-i18n="step4"><span class="step">4</span> Oordeel</h3>
-              <p class="fine" data-i18n="step4Fine">Na laag 1 volgen nog drie lagen filters op steeds kleinere versies van het beeld. Daarna worden het vijf percentages. Het hoogste wint.</p>
-            </div>
-            <div class="verdict-visual" id="stage-verdict"></div>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- 3 DATA -->
-    <section class="chapter field" id="data" aria-labelledby="data-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_data">// 03 · data.csv</p>
-        <div class="chapter-head">
-          <h2 class="head" id="data-title" data-i18n="dataTitle">Alles wat het zag</h2>
-          <p class="lead" data-i18n="dataLead"><span data-fill="n-images">2.527</span> foto's uit <a href="https://github.com/garythung/trashnet">TrashNet</a>. Eén vakje is één foto. Allemaal op wit papier, één voorwerp, iPhone.</p>
-        </div>
-        <div class="bin-fill" id="bin-fill" role="img" data-i18n-attr="aria-label:binFillAria" aria-label="Aantal foto's per soort"></div>
-        <div class="split" id="split"></div>
-        <div class="learn">
-          <div class="learn-head">
-            <h3 data-i18n="learnTitle">Zo leerde het</h3>
-            <p class="fine" data-i18n="learnFine">Validatiefoto's goed, per trainingsronde. Het eigen CNN begon leeg; MobileNet kende al 1,2 miljoen andere foto's.</p>
-            <div class="seg" id="curve-metric"></div>
-          </div>
-          <div class="legend" id="curve-legend"></div>
-          <div class="chart" id="chart-curves"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4 TOETS -->
-    <section class="chapter field" id="toets" aria-labelledby="toets-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_toets">// 04 · resultaten.json</p>
-        <div class="chapter-head">
-          <h2 class="head" id="toets-title" data-i18n="toetsTitle">Resultaten</h2>
-          <p class="lead" data-i18n="toetsLead"><span data-fill="n-test">380</span> foto's die geen van beide modellen eerder zag. Eén vakje per foto, gesorteerd per soort.</p>
-        </div>
-        <div class="legend marks">
-          <span data-i18n="markOk"><i class="mark ok"></i>goed (kleur van de bak)</span>
-          <span data-i18n="markWrong"><i class="mark wrong"></i>fout</span>
-          <span data-i18n="markSure"><i class="mark sure"></i>fout én minstens 80% zeker</span>
-        </div>
-        <div class="exam" id="exam"></div>
-        <div class="results-block">
-          <h3 data-i18n="perTypeTitle">Hoe vaak goed, per soort</h3>
-          <p class="fine" data-i18n="perTypeFine">Van alle testfoto's van een soort: welk deel herkende elk model?</p>
-          <div class="legend" id="class-legend"></div>
-          <div class="class-bars" id="class-bars"></div>
-        </div>
-        <div class="results-block">
-          <h3 data-i18n="mistakesTitle">Waar gaat het mis?</h3>
-          <p class="fine" data-i18n="mistakesFine">De vier keer dat een soort het vaakst voor een andere soort werd aangezien.</p>
-          <div class="mixups" id="mixups"></div>
-        </div>
-        <details class="more">
-          <summary data-i18n="allNumbers">Alle cijfers per soort</summary>
-          <div id="table-classes"></div>
-        </details>
-      </div>
-    </section>
-
-    <!-- 5 LAB -->
-    <section class="chapter field" id="lab" aria-labelledby="lab-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_lab">// 05 · lab.js</p>
-        <div class="chapter-head">
-          <h2 class="head" id="lab-title" data-i18n="labTitle">Breek het</h2>
-          <p class="lead" data-i18n="labLead">Echt afval ligt niet op wit papier. Draai aan de knoppen.</p>
-        </div>
-        <div class="strip light" data-thumbs></div>
-        <div class="lab">
-          <div class="lab-photo">
-            <canvas id="test-image" data-i18n-attr="aria-label:testImageAria" aria-label="Aangepaste foto"></canvas>
-          </div>
-          <div class="lab-controls">
-            <div class="sliders" id="sliders"></div>
-            <button type="button" class="button quiet" id="reset" data-i18n="reset">Terug naar origineel</button>
-          </div>
-          <div class="lab-verdicts" id="test-verdicts" aria-live="polite"></div>
-        </div>
-        <div class="measured">
-          <h3 data-i18n="measuredTitle">Gemeten op alle <span data-fill="n-test">380</span> testfoto's</h3>
-          <div class="legend" id="var-legend"></div>
-          <div id="chart-variations" class="multiples"></div>
-          <p class="fine" id="var-note"></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6 ZEKER ≠ JUIST -->
-    <section class="chapter field" id="vertrouwen" aria-labelledby="vertrouwen-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_vertrouwen">// 06 · vertrouwen.md</p>
-        <div class="moment">
-          <img id="moment-img" alt="Tijdschriftpagina vol kleurige plaatjes" src="assets/examples/paper93.jpg">
+        <div class="to-explainer">
           <div>
-            <h2 class="head" id="vertrouwen-title" data-i18n="vertrouwenTitle">Vol vertrouwen in de verkeerde bak</h2>
-            <dl class="moment-stats" id="moment-stats"></dl>
-            <p class="lead" id="moment-text"></p>
+            <h2 data-i18n="nextTitle">Hoe kiest de AI?</h2>
+            <p class="fine" data-i18n="nextFine">Kijk mee in het model, zie alle resultaten op 380 testfoto's, en probeer het te breken.</p>
           </div>
-        </div>
-        <div class="hard" id="hard"></div>
-      </div>
-    </section>
-
-    <!-- 7 RESPONSIBLE AI -->
-    <section class="chapter field" id="rai" aria-labelledby="rai-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_rai">// 07 · responsible-ai.md</p>
-        <div class="chapter-head">
-          <h2 class="head" id="rai-title">Responsible AI</h2>
-          <p class="lead" data-i18n="raiLead">Hoe ik in dit project verantwoord met AI omging: per principe wat ik vond, en wat ik eraan deed.</p>
-        </div>
-        <div class="rai">
-          <article class="rai-tile dark">
-            <p class="rai-kicker" data-i18n="rai1"><span>1</span>Datakwaliteit en bias</p>
-            <div class="rai-bars" id="rai-bias-bars"></div>
-            <p class="rai-text" id="rai-bias"></p>
-            <p class="rai-did" id="rai-bias-did"></p>
-            <a class="rai-link" href="#lab" data-i18n="rai1Link">Test het in het lab</a>
-          </article>
-          <article class="rai-tile">
-            <p class="rai-kicker" data-i18n="rai2"><span>2</span>Betrouwbaarheid</p>
-            <p class="rai-big alert" id="rai-trust-big"></p>
-            <p class="rai-text" id="rai-trust"></p>
-            <p class="rai-did" data-i18n="rai2Did">Daarom toont deze site altijd alle vijf percentages, niet alleen het winnende label, en zet overtuigde fouten apart, in rood.</p>
-            <a class="rai-link" href="#vertrouwen" data-i18n="rai2Link">Bekijk de overtuigde fouten</a>
-          </article>
-          <article class="rai-tile">
-            <p class="rai-kicker" data-i18n="rai3"><span>3</span>Transparantie</p>
-            <p class="rai-big" data-i18n="rai3Big">49.152 → 5</p>
-            <p class="rai-text" data-i18n="rai3Text">Een neuraal netwerk legt niet uit waaróm het kiest.</p>
-            <p class="rai-did" data-i18n="rai3Did">Daarom laat deze site elke stap zien, live op jouw foto: de pixels, de 32 echte filters met hun gewichten, en de vijf percentages.</p>
-            <a class="rai-link" href="#machine" data-i18n="rai3Link">Kijk mee in het model</a>
-          </article>
-          <article class="rai-tile">
-            <p class="rai-kicker" data-i18n="rai4"><span>4</span>Privacy</p>
-            <p class="rai-big" data-i18n="rai4Big">0 foto's verstuurd</p>
-            <p class="rai-text" data-i18n="rai4Text">Een foto van thuis kan meer laten zien dan alleen afval.</p>
-            <p class="rai-did" data-i18n="rai4Did">Daarom draait het model in je browser. Er is geen server die je foto ziet of bewaart.</p>
-            <a class="rai-link" href="#own" data-i18n="rai4Link">Test je eigen afval</a>
-          </article>
-          <article class="rai-tile dark">
-            <p class="rai-kicker" data-i18n="rai5"><span>5</span>Menselijke controle</p>
-            <p class="rai-big" data-i18n="rai5Big">Jij eerst.</p>
-            <p class="rai-text" data-i18n="rai5Text">Een AI-antwoord kan je eigen oordeel sturen, ook als het fout is.</p>
-            <p class="rai-did" data-i18n="rai5Did">Daarom kies je in het spel eerst zelf, voordat je de AI ziet. De site neemt nooit zelf een besluit en zegt erbij dat het een lesvoorbeeld is, geen afvalwijzer.</p>
-            <a class="rai-link" href="#spel" data-i18n="rai5Link">Speel tegen de AI</a>
-          </article>
-          <article class="rai-tile">
-            <p class="rai-kicker" data-i18n="rai6"><span>6</span>Duurzaamheid</p>
-            <p class="rai-big" id="rai-green-big"></p>
-            <p class="rai-text" id="rai-green"></p>
-            <p class="rai-did" id="rai-green-did"></p>
-            <a class="rai-link" href="#data" data-i18n="rai6Link">Zie hoe het leerde</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 8 VRAGEN -->
-    <section class="chapter field" id="vragen" aria-labelledby="vragen-title">
-      <div class="wrap faq-wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_vragen">// 08 · vragen.md</p>
-        <h2 class="head" id="vragen-title" data-i18n="vragenTitle">Meer weten</h2>
-        <div class="faq">
-          <details name="faq">
-            <summary data-i18n="faq1Q">Waarom is restafval het moeilijkst?</summary>
-            <p data-i18n="faq1A">Er zijn maar <span data-fill="n-trash">137</span> foto's van, tegen <span data-fill="n-paper">997</span> van papier en karton. Fouten op restafval telden bij het trainen zwaarder mee, maar meer voorbeelden is daar geen vervanging voor.</p>
-          </details>
-          <details name="faq">
-            <summary data-i18n="faq2Q">Vijf soorten, vijf bakken?</summary>
-            <p data-i18n="faq2A">Nee. Het model kent materialen, geen regels. In veel gemeenten gaan plastic, metaal en drinkpakken samen in de PMD-bak; elders haalt de verwerker plastic achteraf uit het restafval. Een gebruikte tissue is papier, maar hoort bij het restafval. Batterijen, elektronica of verf kent het model niet eens: het kiest altijd één van de vijf. Twijfel je, kijk dan in de afvalwijzer van je gemeente.</p>
-          </details>
-          <details name="faq">
-            <summary data-i18n="faq3Q">Rekent je browser hetzelfde als Python?</summary>
-            <p id="parity" data-state="pending">Wordt gecontroleerd zodra de modellen geladen zijn…</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- 9 OVER -->
-    <section class="chapter field" id="over" aria-labelledby="over-title">
-      <div class="wrap">
-        <p class="sec-label" aria-hidden="true" data-i18n="sec_over">// 09 · colofon.md</p>
-        <div class="colofon">
-          <div class="colofon-text">
-            <h2 class="head" id="over-title" data-i18n="overTitle">Waarom het gemaakt is</h2>
-            <p class="story" data-i18n="story">Gemaakt als persoonlijk artefact voor school: de learning group computer vision in het semester Responsible AI van ICT @ Hogeschool van Amsterdam. Ik wilde weten hoe goed een model dat ik zelf vanaf nul train afval kan herkennen, en vooral waar het misgaat.</p>
-            <h3 data-i18n="howTitle">Zo is het gemaakt</h3>
-            <ol class="how">
-              <li data-i18n="how1"><b>Data</b><span><span data-fill="n-images">2.527</span> foto's uit TrashNet, papier en karton samengevoegd tot vijf soorten, en vast verdeeld: 70% om van te leren, 15% om instellingen te kiezen, 15% om te toetsen.</span></li>
-              <li data-i18n="how2"><b>Trainen</b><span>Een compact CNN met vier lagen filters, vanaf nul getraind in PyTorch. Ter vergelijking een voorgetraind MobileNet, dat ImageNet al kende, kort bijgetraind op dezelfde foto's.</span></li>
-              <li data-i18n="how3"><b>Toetsen</b><span>Elke score op deze pagina is gemeten op <span data-fill="n-test">380</span> testfoto's die geen van beide modellen eerder zag.</span></li>
-              <li data-i18n="how4"><b>In je browser</b><span>Beide modellen omgezet naar ONNX en uitgevoerd met ONNX Runtime Web, met tot op de pixel dezelfde voorbewerking als in Python.</span></li>
-            </ol>
-            <a class="story-end" href="#spel" data-i18n="storyEnd">Speel nog een keer.</a>
-          </div>
-          <aside class="tldr" aria-label="Samenvatting" data-i18n-attr="aria-label:tldrAria">
-            <p class="tldr-tab">tl;dr</p>
-            <ul>
-              <li data-i18n="tldr1">Persoonlijk artefact, learning group computer vision</li>
-              <li data-i18n="tldr2">Semester Responsible AI, ICT @ Hogeschool van Amsterdam</li>
-              <li data-i18n="tldr3">Eigen CNN, vanaf nul getraind in PyTorch</li>
-              <li data-i18n="tldr4">MobileNet (voorgetraind) ter vergelijking</li>
-              <li data-i18n="tldr5"><span data-fill="n-images">2.527</span> foto's uit TrashNet</li>
-              <li data-i18n="tldr6">Draait in je browser: je foto blijft hier</li>
-              <li data-i18n="tldr7">Alle scores gemeten op <span data-fill="n-test">380</span> ongeziene foto's</li>
-            </ul>
-          </aside>
+          <a class="button" href="explainer.html" data-i18n="nextButton">Naar de uitleg</a>
         </div>
       </div>
     </section>
@@ -356,9 +90,10 @@
     <div class="wrap">
       <p class="footer-mark" aria-hidden="true" data-i18n="footerMark">Wat bakt AI ervan?</p>
       <div class="footer-cols">
-        <div><h3>Data</h3><a href="https://github.com/garythung/trashnet">TrashNet</a><span>Gary Thung &amp; Mindy Yang, 2017</span></div>
-        <div data-i18n="footerModels"><h3>Modellen</h3><span>Eigen CNN, PyTorch</span><span>MobileNetV3-Small, torchvision</span><span>ONNX Runtime Web</span></div>
-        <div data-i18n="footerMade"><h3>Gemaakt door</h3><span>Nguyen Anh Le</span><span>Learning group computer vision</span><span>Responsible Applied AI, ICT, HvA</span></div>
+        <div data-i18n="footerData"><h3>Data</h3><span class="f-row"><span>Dataset</span><span><a href="https://github.com/garythung/trashnet">TrashNet</a></span></span><span class="f-row"><span>Door</span><span>Gary Thung &amp; Mindy Yang</span></span><span class="f-row"><span>Jaar</span><span>2017</span></span><span class="f-row"><span>Foto's</span><span>2.527</span></span></div>
+        <div data-i18n="footerModels"><h3>Software</h3><span class="f-row"><span>DABI 1.1 en DABI 1.2</span><span><a href="https://pytorch.org">PyTorch</a></span></span><span class="f-row"><span>MobileNetV3-Small</span><span><a href="https://github.com/pytorch/vision">torchvision</a></span></span><span class="f-row"><span>In de browser</span><span><a href="https://onnxruntime.ai">ONNX Runtime Web</a></span></span></div>
+        <div data-i18n="footerLicences"><h3>Licenties</h3><span class="f-row"><span>MIT</span><span><a href="https://github.com/skitzofeinic/does-ai-bin-it/blob/main/LICENSE">Dit project</a>, <a href="https://github.com/garythung/trashnet/blob/master/LICENSE">TrashNet</a>, ONNX Runtime</span></span><span class="f-row"><span>BSD</span><span>PyTorch, torchvision</span></span><span class="f-row"><span>OFL 1.1</span><span>JetBrains Mono</span></span><span class="f-row"><span>Niet-commercieel</span><span><a href="https://image-net.org/download">MobileNet</a></span></span><span class="f-row"><span>Vrij</span><span><a href="https://www.afvalcirculair.nl/publish/pages/124417/rws_richtlijnen_pictogrammenset_def-toegankelijk.pdf">Kleuren (Rijkswaterstaat)</a></span></span><span class="f-note">MobileNet is voorgetraind op ImageNet: alleen voor onderzoek en onderwijs. De kleuren zijn vrij te gebruiken voor afvalscheiding.</span></div>
+        <div data-i18n="footerMade"><h3>Gemaakt door</h3><span class="f-row"><span>Naam</span><span>Nguyen Anh Le</span></span><span class="f-row"><span>Portfolio</span><span><a href="https://skitzofeinic.github.io/" rel="me">skitzofeinic.github.io</a></span></span><span class="f-row"><span>GitHub</span><span><a href="https://github.com/skitzofeinic" rel="me">skitzofeinic</a></span></span><span class="f-row"><span>LinkedIn</span><span><a href="https://www.linkedin.com/in/anhle37/" rel="me">anhle37</a></span></span></div>
       </div>
     </div>
   </footer>

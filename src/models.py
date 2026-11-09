@@ -5,8 +5,12 @@ from torchvision import models
 
 from preprocess import CLASSES
 
-# Invoergrootte per model (vierkant, RGB)
-IMAGE_SIZE = {"cnn": 128, "mobilenet": 224}
+# Invoergrootte per model (vierkant, RGB). cnn = DABI 1.1, cnn-1.2 = DABI 1.2 (een blok extra)
+IMAGE_SIZE = {"cnn": 128, "cnn-1.2": 128, "mobilenet": 224}
+
+# Kanalen per convolutieblok. Verder trainen vanaf 1.1 met meer epochs of een lagere lr
+# bracht val bal. acc niet boven 0,796, dus 1.2 krijgt meer capaciteit en traint vanaf nul.
+WIDTHS = {"cnn": (32, 64, 128, 256), "cnn-1.2": (32, 64, 128, 256, 256)}
 
 
 def conv_block(c_in: int, c_out: int) -> nn.Sequential:
@@ -19,21 +23,19 @@ def conv_block(c_in: int, c_out: int) -> nn.Sequential:
 
 
 class WasteCNN(nn.Module):
-    """4 convolutieblokken + global average pooling. Invoer (N, 3, 128, 128), genormaliseerd."""
+    """Convolutieblokken (elk halveert de resolutie) + global average pooling.
+    Invoer (N, 3, 128, 128), genormaliseerd. Standaard 4 blokken: 128 -> 8."""
 
-    def __init__(self, n_classes: int = len(CLASSES)):
+    def __init__(self, n_classes: int = len(CLASSES), widths: tuple[int, ...] = WIDTHS["cnn"]):
         super().__init__()
-        self.features = nn.Sequential(
-            conv_block(3, 32),     # 128 -> 64
-            conv_block(32, 64),    # 64 -> 32
-            conv_block(64, 128),   # 32 -> 16
-            conv_block(128, 256),  # 16 -> 8
-        )
+        channels = (3, *widths)
+        self.features = nn.Sequential(*(conv_block(c_in, c_out)
+                                        for c_in, c_out in zip(channels, channels[1:])))
         self.head = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
             nn.Flatten(),
             nn.Dropout(0.3),
-            nn.Linear(256, n_classes),
+            nn.Linear(widths[-1], n_classes),
         )
 
     def forward(self, x):
@@ -48,8 +50,8 @@ def mobilenet(n_classes: int = len(CLASSES)) -> nn.Module:
 
 
 def build(name: str) -> nn.Module:
-    if name == "cnn":
-        return WasteCNN()
+    if name in WIDTHS:
+        return WasteCNN(widths=WIDTHS[name])
     if name == "mobilenet":
         return mobilenet()
     raise ValueError(f"onbekend model: {name}")

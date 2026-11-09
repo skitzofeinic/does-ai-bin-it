@@ -1,6 +1,6 @@
 """Exporteer de getrainde modellen naar ONNX en controleer dat ONNX hetzelfde voorspelt.
 
-Gebruik (vanuit does-ai-bin-it/):  python src/export.py
+Gebruik (vanuit does-ai-bin-it/):  python src/export.py [--model cnn-1.2]
 
 - `model/<naam>.onnx`: invoer `image` (N, 3, S, S, genormaliseerd), uitvoer `probabilities` (N, 5);
 - `results/parity_onnx.json`: verschil PyTorch vs ONNX Runtime (Python) op de hele testset.
@@ -8,6 +8,7 @@ Gebruik (vanuit does-ai-bin-it/):  python src/export.py
 De vergelijking met de browser (ONNX Runtime Web) volgt in de explainer.
 """
 
+import argparse
 import json
 
 import numpy as np
@@ -49,8 +50,17 @@ def export(name: str) -> dict:
 
 
 def main():
-    out = [export(name) for name in IMAGE_SIZE]
-    (ROOT / "results" / "parity_onnx.json").write_text(json.dumps(out, indent=1))
+    parser = argparse.ArgumentParser()
+    # Eén model exporteren; de andere regels in parity_onnx.json blijven staan
+    parser.add_argument("--model", choices=IMAGE_SIZE)
+    args = parser.parse_args()
+    parity = ROOT / "results" / "parity_onnx.json"
+    if args.model:
+        out = [r for r in json.loads(parity.read_text()) if r["model"] != args.model] + [export(args.model)]
+        out.sort(key=lambda r: list(IMAGE_SIZE).index(r["model"]))
+    else:
+        out = [export(name) for name in IMAGE_SIZE]
+    parity.write_text(json.dumps(out, indent=1))
     for r in out:
         print(f"{r['model']}: {r['onnx_bytes'] / 1e6:.1f} MB, max verschil {r['max_abs_diff']:.2e}, "
               f"zelfde voorspelling {r['same_prediction']}/{r['n_test']}")
